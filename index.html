@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accueil TPC Summit, Edge of AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#FFFFFF; --glow:#C2C0FF; --surface:#FFFFFF; --ink:#0A0A0A; --muted:#5B5B6B;
+  --line:#E4E3F0; --soft:#EDECFF; --action:#3932FF; --action-hover:#251DE7; --on-action:#FFFFFF;
+  --dark:#0A0A0A; --on-dark:#FFFFFF;
+  --ok:#0C9756; --ok-soft:#E3FDF1; --ok-ink:#0D6E40; --warn:#C20A23; --warn-soft:#FDE3E6;
+  --font:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --bottombar:76px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#030223; --glow:#251DE7; --surface:#0B0854; --ink:#FFFFFF; --muted:#A9A7D6;
+    --line:#22207A; --soft:#14117A; --action:#3932FF; --action-hover:#726CFD; --on-action:#FFFFFF;
+    --dark:#FFFFFF; --on-dark:#030223;
+    --ok:#0AC26C; --ok-soft:#093621; --ok-ink:#89FAC6; --warn:#FB566C; --warn-soft:#330A10;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#030223; --glow:#251DE7; --surface:#0B0854; --ink:#FFFFFF; --muted:#A9A7D6;
+  --line:#22207A; --soft:#14117A; --action:#3932FF; --action-hover:#726CFD; --on-action:#FFFFFF;
+  --dark:#FFFFFF; --on-dark:#030223;
+  --ok:#0AC26C; --ok-soft:#093621; --ok-ink:#89FAC6; --warn:#FB566C; --warn-soft:#330A10;
+}
+
+/* ---------- base (mobile) ---------- */
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100%; font-family:var(--font); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(ellipse at 100% 0%, var(--glow) 0%, transparent 45%);
+  background-repeat:no-repeat; background-size:100% 340px; -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent; overscroll-behavior-y:contain;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:3px solid color-mix(in srgb, var(--action) 45%, transparent); outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:12px 14px calc(var(--bottombar) + 24px)}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:36px}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1}
+.logo span{font-family:var(--serif);font-weight:400;letter-spacing:0;margin-left:5px}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;text-align:right}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.sync.live i{background:var(--ok)}
+
+/* stats */
+.hero{margin:14px 0 6px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.count{font-size:60px;font-weight:800;line-height:.85;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.count small{font-size:.36em;font-weight:500;letter-spacing:-.02em;color:var(--muted)}
+.hero-side{flex:1;min-width:150px;padding-bottom:2px}
+.hero-side h1{margin:0 0 3px;font-size:15px;font-weight:600;line-height:1.2}
+.hero-side p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+.hero-side b{color:var(--ink);font-weight:600}
+.bar{flex-basis:100%;height:5px;border-radius:5px;background:var(--soft);overflow:hidden;margin-top:8px}
+.bar div{height:100%;background:var(--action);width:0;transition:width .5s ease}
+
+/* search (sticky) */
+.searchbar{position:sticky;top:0;z-index:5;margin:0 -14px;padding:calc(8px + env(safe-area-inset-top,0px)) 14px 10px;
+  background:var(--bg);border-bottom:1px solid transparent;transition:border-color .2s}
+.searchbar.stuck{border-bottom-color:var(--line)}
+.search{position:relative}
+.search input{width:100%;height:56px;border-radius:14px;border:2px solid var(--line);background:var(--surface);
+  padding:0 52px 0 16px;font-size:18px;font-weight:500;outline:none;-webkit-appearance:none;appearance:none}
+.search input::-webkit-search-cancel-button{display:none}
+.search input:focus{border-color:var(--action)}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.clear{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:10px;border:0;background:var(--soft);font-size:22px;line-height:1;display:none}
+.clear.show{display:block}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px;padding:4px;border-radius:12px;background:var(--soft)}
+.chip{height:40px;border-radius:9px;border:0;background:transparent;font-size:14px;font-weight:500;padding:0 6px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(3,2,35,.12)}
+.chip em{font-style:normal;opacity:.55;margin-left:3px;font-variant-numeric:tabular-nums}
+
+/* buttons */
+.btn{height:48px;padding:0 18px;border-radius:12px;border:0;font-weight:600;font-size:16px}
+.btn-primary{background:var(--action);color:var(--on-action)}
+.btn-primary:active{background:var(--action-hover)}
+.btn-dark{background:var(--dark);color:var(--on-dark)}
+.btn-outline{background:transparent;border:1.5px solid var(--action);color:var(--action)}
+.btn-ghost{background:transparent;color:var(--muted);font-weight:500}
+.btn-sm{height:40px;font-size:14px;padding:0 14px}
+
+/* list */
+.list{list-style:none;margin:4px 0 0;padding:0}
+.row{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line)}
+.who{flex:1;min-width:0}
+.name{font-size:17px;font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.name mark,.meta mark{background:var(--soft);color:inherit;border-radius:3px;padding:0 1px}
+.meta{font-size:13px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--action);margin-left:6px;vertical-align:2px}
+.row .btn-primary{min-width:96px;height:52px;flex-shrink:0}
+.row.in{flex-wrap:wrap;background:var(--ok-soft);border-radius:14px;border-bottom-color:transparent;margin:6px 0;padding:12px}
+.status{font-size:13px;color:var(--ok-ink);font-weight:600;margin-top:3px}
+.right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.row.in .right{width:100%;justify-content:space-between}
+.stepper{display:flex;align-items:center;background:var(--surface);border-radius:12px;border:1.5px solid var(--line);height:48px}
+.stepper button{width:52px;height:100%;border:0;background:transparent;font-size:24px;font-weight:500}
+.stepper button:disabled{opacity:.3;cursor:default}
+.stepper output{min-width:44px;text-align:center;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
+.undo{height:48px;border:0;background:transparent;color:var(--muted);font-size:14px;padding:0 6px;text-decoration:underline;text-underline-offset:3px}
+.undo.armed{color:var(--warn);font-weight:600}
+.empty{padding:32px 8px;text-align:center;color:var(--muted);font-size:15px;line-height:1.5}
+.empty .btn{margin-top:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.more{display:block;margin:14px auto 0}
+.more[hidden]{display:none}
+
+/* footer */
+.foot{margin-top:32px;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:13px}
+.foot .btn{width:100%}
+
+/* bottom bar (thumb zone) */
+.bottombar{position:fixed;left:0;right:0;bottom:0;z-index:8;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+  background:color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.bottombar .btn{width:100%;height:54px;font-size:17px;display:block;max-width:832px;margin:0 auto}
+
+/* dialog = bottom sheet on mobile */
+dialog{border:0;padding:0;background:var(--surface);color:var(--ink);
+  width:100%;max-width:100%;margin:auto 0 0;border-radius:22px 22px 0 0;max-height:92%;overflow:auto}
+dialog::backdrop{background:rgba(3,2,35,.55)}
+.dlg{padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+.grip{width:40px;height:5px;border-radius:5px;background:var(--line);margin:0 auto 14px}
+.dlg h2{margin:0 0 4px;font-size:20px}
+.dlg p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.field input{width:100%;height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);padding:0 14px;font-size:17px}
+.field input:focus{outline:none;border-color:var(--action)}
+.two{display:grid;grid-template-columns:1fr;gap:0 12px}
+.dlg-actions{display:flex;flex-direction:column-reverse;gap:8px;margin-top:18px}
+.dlg-actions .btn{width:100%;height:54px}
+
+/* toast (above bottom bar) */
+.toast{position:fixed;left:14px;right:14px;bottom:calc(var(--bottombar) + 12px + env(safe-area-inset-bottom,0px));
+  transform:translateY(20px);opacity:0;pointer-events:none;
+  background:var(--ok);color:#fff;padding:15px 18px;border-radius:14px;font-weight:600;font-size:16px;z-index:20;text-align:center;
+  transition:transform .22s ease,opacity .22s ease;box-shadow:0 10px 30px rgba(3,2,35,.25)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{background:var(--warn)}
+
+/* ---------- larger screens ---------- */
+@media (min-width:420px){
+  .two{grid-template-columns:1fr 1fr}
+}
+@media (min-width:720px){
+  .wrap{padding:20px 24px calc(var(--bottombar) + 32px)}
+  .logo{font-size:28px}
+  .sync{font-size:13px}
+  .hero{margin:28px 0 14px;gap:22px}
+  .count{font-size:132px}
+  .hero-side h1{font-size:20px;margin-bottom:6px}
+  .hero-side p{font-size:15px}
+  .bar{height:6px;margin-top:14px}
+  .searchbar{margin:0 -24px;padding-left:24px;padding-right:24px}
+  .search input{height:64px;font-size:21px}
+  .seg{display:inline-grid;grid-template-columns:repeat(3,auto)}
+  .chip{padding:0 18px;font-size:15px}
+  .row{padding:14px 4px}
+  .name{font-size:19px}
+  .meta{font-size:14px}
+  .row.in{flex-wrap:nowrap;padding:14px 14px}
+  .row.in .right{width:auto}
+  .foot{flex-direction:row;align-items:center}
+  .foot .btn{width:auto}
+  dialog{width:min(520px,calc(100% - 32px));margin:auto;border-radius:20px}
+  .grip{display:none}
+  .dlg{padding:24px}
+  .dlg-actions{flex-direction:row;justify-content:flex-end}
+  .dlg-actions .btn{width:auto;height:48px}
+  .toast{left:50%;right:auto;transform:translate(-50%,20px);max-width:480px}
+  .toast.show{transform:translate(-50%,0)}
+}
+/* import screen */
+.import{display:none;margin:28px 0;padding:22px 18px;border:2px dashed var(--line);border-radius:18px;background:var(--surface);text-align:center}
+.import h2{margin:0 0 6px;font-size:20px}
+.import p{margin:0 auto 16px;color:var(--muted);font-size:15px;line-height:1.45;max-width:46ch}
+.import .btn{width:100%;max-width:360px}
+.import small{display:block;margin-top:12px;color:var(--muted);font-size:13px}
+body.noguests .import{display:block}
+body.noguests .searchbar, body.noguests .list, body.noguests #emptyBox, body.noguests .more, body.noguests .bottombar, body.noguests #exportBtn, body.noguests .linkbtn{display:none}
+.linkbtn{border:0;background:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:13px;padding:8px 0;text-align:left}
+@media (hover:hover){
+  .btn-primary:hover{background:var(--action-hover)}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo" aria-label="TPC. Summit">TPC.<span>Summit</span></div>
+    <div class="sync" id="sync"><i></i><span>Connexion…</span></div>
+  </header>
+
+  <section class="hero" aria-live="polite">
+    <div class="count" id="count">0<small> / 0</small></div>
+    <div class="hero-side">
+      <h1>Edge of AI, accueil</h1>
+      <p id="summary">Chargement de la liste…</p>
+    </div>
+    <div class="bar"><div id="bar"></div></div>
+  </section>
+
+  <section class="import" id="importBox">
+    <h2>Importer la liste des participants</h2>
+    <p>Choisissez le fichier CSV exporté de votre outil d'inscription. Il reste sur cet appareil et n'est envoyé nulle part.</p>
+    <label class="btn btn-primary" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">
+      Choisir le fichier CSV<input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+    </label>
+    <small>Colonnes reconnues : Prénom, Nom, Entreprise, Poste, Email pro ou Email d'inscription.</small>
+  </section>
+
+  <div class="searchbar">
+    <div class="search">
+      <input id="q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+        placeholder="Nom, prénom ou entreprise" aria-label="Rechercher un invité">
+      <button class="clear" id="clear" aria-label="Effacer la recherche">×</button>
+    </div>
+    <div class="seg" role="group" aria-label="Filtrer">
+      <button class="chip" data-f="all" aria-pressed="true">Tous<em id="nAll"></em></button>
+      <button class="chip" data-f="todo" aria-pressed="false">Attendus<em id="nTodo"></em></button>
+      <button class="chip" data-f="in" aria-pressed="false">Arrivés<em id="nIn"></em></button>
+    </div>
+  </div>
+
+  <ul class="list" id="list"></ul>
+  <div id="emptyBox"></div>
+  <button class="btn btn-ghost more" id="more" hidden>Afficher plus</button>
+
+  <footer class="foot">
+    <button class="btn btn-outline btn-sm" id="exportBtn">Exporter les présences (CSV)</button>
+    <span id="footNote"></span>
+    <label class="linkbtn" style="cursor:pointer">Changer de liste<input type="file" id="csvFile2" accept=".csv,text/csv" hidden></label>
+  </footer>
+</div>
+
+<div class="bottombar"><button class="btn btn-dark" id="addBtn">Ajouter une personne hors liste</button></div>
+
+<dialog id="dlg">
+  <form class="dlg" id="walkForm" method="dialog">
+    <div class="grip" aria-hidden="true"></div>
+    <h2>Ajouter une personne hors liste</h2>
+    <p>Elle sera enregistrée comme arrivée.</p>
+    <div class="two">
+      <div class="field"><label for="wp">Prénom</label><input id="wp" required autocomplete="off" autocapitalize="words" enterkeyhint="next"></div>
+      <div class="field"><label for="wn">Nom</label><input id="wn" required autocomplete="off" autocapitalize="words" enterkeyhint="next"></div>
+    </div>
+    <div class="field"><label for="wc">Entreprise</label><input id="wc" autocomplete="off" autocapitalize="words" enterkeyhint="done"></div>
+    <div class="field"><label>Accompagnants</label>
+      <div class="stepper" style="width:max-content">
+        <button type="button" id="wMinus" aria-label="Retirer un accompagnant">−</button>
+        <output id="wPlus">+0</output>
+        <button type="button" id="wAdd" aria-label="Ajouter un accompagnant">+</button>
+      </div>
+    </div>
+    <div class="dlg-actions">
+      <button type="button" class="btn btn-ghost" id="wCancel">Annuler</button>
+      <button type="submit" class="btn btn-primary" value="ok">Enregistrer l'arrivée</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+let GUESTS = [];
+const LS_GUESTS = 'tpc-summit-edge-ai-guests-v1';
+const LS_KEY = 'tpc-summit-edge-ai-checkins-v1';
+const PAGE = 60;
+
+// ---------- state ----------
+let checkins = {};   // id -> {at, plus}
+let walkins = {};    // id -> {p,n,c,at,plus}
+let filter = 'all', query = '', limit = PAGE;
+let store = null;    // {setCheckin, setWalkin}
+let mode = 'local';
+const pendingPlus = {};
+
+const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const byName = (a,b) => norm(a.n).localeCompare(norm(b.n)) || norm(a.p).localeCompare(norm(b.p));
+function setGuests(list, persist){
+  const seen = {};
+  GUESTS = list.map(g => {
+    let id = g.id || ('g' + hash(norm(g.p+'|'+g.n+'|'+g.e)));
+    while (seen[id]) id += 'x';
+    seen[id] = 1;
+    return {...g, id, h: norm(g.p+' '+g.n+' '+g.c)};
+  }).sort(byName);
+  if (persist) { try { localStorage.setItem(LS_GUESTS, JSON.stringify(GUESTS.map(({h,...r}) => r))); } catch(e){} }
+  document.body.classList.toggle('noguests', !GUESTS.length);
+}
+function hash(s){ let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i)) >>> 0; return h.toString(36); }
+
+// CSV parsing (quotes, commas or semicolons, CRLF, BOM)
+function parseCSV(text){
+  text = text.replace(/^\ufeff/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const sep = (first.split(';').length > first.split(',').length) ? ';' : ',';
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i=0;i<text.length;i++){
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === sep) { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+function guestsFromCSV(text){
+  const rows = parseCSV(text);
+  if (rows.length < 2) throw new Error('Le fichier est vide.');
+  const head = rows[0].map(h => norm(h).trim());
+  const col = (...names) => { for (const n of names) { const i = head.indexOf(norm(n)); if (i > -1) return i; } return -1; };
+  const iP = col('Prénom','Prenom','First name','Firstname'), iN = col('Nom','Last name','Lastname');
+  if (iP < 0 || iN < 0) throw new Error('Colonnes « Prénom » et « Nom » introuvables.');
+  const iC = col('Entreprise','Company','Société'), iR = col('Poste','Job title','Titre','Fonction');
+  const iE = col('Email pro'), iE2 = col("Email d'inscription",'Email','E-mail');
+  const v = (r,i) => i > -1 ? (r[i]||'').trim() : '';
+  return rows.slice(1).map(r => ({p:v(r,iP), n:v(r,iN), c:v(r,iC), r:v(r,iR), e:v(r,iE) || v(r,iE2)}))
+             .filter(g => g.p && g.n);
+}
+function importFile(file){
+  if (!file) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      const list = guestsFromCSV(String(fr.result));
+      if (!list.length) throw new Error('Aucun participant trouvé dans le fichier.');
+      setGuests(list, true); limit = PAGE; render();
+      toast(`${list.length} participants importés`);
+    } catch(e){ toast(e.message || 'Fichier illisible.', true); }
+  };
+  fr.readAsText(file, 'utf-8');
+}
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hhmm = iso => { try { return new Date(iso).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } };
+
+// ---------- local fallback ----------
+function loadLocal(){
+  try { const d = JSON.parse(localStorage.getItem(LS_KEY)||'{}'); checkins = d.checkins||{}; walkins = d.walkins||{}; } catch(e){}
+}
+function saveLocal(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify({checkins, walkins})); } catch(e){}
+}
+const localStore = {
+  async setCheckin(id, v){ if (v) checkins[id]=v; else delete checkins[id]; saveLocal(); render(); },
+  async setWalkin(id, v){ if (v) walkins[id]=v; else delete walkins[id]; saveLocal(); render(); }
+};
+
+// ---------- shared db ----------
+async function initDb(){
+  if (!window.claude || !window.claude.use) return false;
+  let db = null;
+  try { db = await window.claude.use('db'); } catch(e){ db = null; }
+  if (!db) return false;
+  const ci = db.collection('checkins'), wi = db.collection('walkins');
+  let firstC = false, firstW = false;
+  ci.onSnapshot(snap => {
+    const m = {}; snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
+    for (const id in pendingPlus) if (m[id]) m[id] = {...m[id], plus: pendingPlus[id]};
+    checkins = m; firstC = true; render();
+  }, err => setSync('err'));
+  wi.onSnapshot(snap => {
+    const m = {}; snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
+    walkins = m; firstW = true; render();
+  }, err => setSync('err'));
+  store = {
+    async setCheckin(id, v){
+      if (v) { checkins[id]=v; render(); await write(() => ci.doc(id).set(v)); }
+      else { delete checkins[id]; render(); await write(() => ci.doc(id).delete()); }
+    },
+    async setWalkin(id, v){
+      if (v) { walkins[id]=v; render(); await write(() => wi.doc(id).set(v)); }
+      else { delete walkins[id]; render(); await write(() => wi.doc(id).delete()); }
+    }
+  };
+  mode = 'db';
+  setSync('live');
+  return true;
+}
+async function write(fn){
+  try { await fn(); }
+  catch(e){
+    if (e && e.code === 'unavailable') {
+      await new Promise(r => setTimeout(r, 400 + Math.random()*600));
+      try { await fn(); return; } catch(e2){ e = e2; }
+    }
+    const msg = e && e.code === 'invalid_argument'
+      ? "Enregistrement refusé : demandez à l'organisatrice un accès Contributeur."
+      : "Enregistrement impossible, vérifiez la connexion puis réessayez.";
+    toast(msg, true);
+  }
+}
+function setSync(s){
+  const el = $('sync');
+  el.classList.toggle('live', s==='live');
+  el.querySelector('span').textContent =
+    s==='live' ? 'Synchronisé' :
+    s==='err' ? 'Synchro coupée, rechargez' :
+    'Sur cet appareil';
+}
+
+// ---------- actions ----------
+function checkIn(id){
+  const g = GUESTS.find(x => x.id===id);
+  store.setCheckin(id, {at:new Date().toISOString(), plus:0});
+  toast(`${g.p} ${g.n} est arrivé·e`);
+}
+const plusTimers = {};
+function changePlus(id, delta, isWalk){
+  const src = isWalk ? walkins : checkins;
+  const cur = src[id]; if (!cur) return;
+  const next = Math.max(0, Math.min(9, (cur.plus||0) + delta));
+  if (next === (cur.plus||0)) return;
+  src[id] = {...cur, plus:next};
+  if (!isWalk) pendingPlus[id] = next;
+  render();
+  clearTimeout(plusTimers[id]);
+  plusTimers[id] = setTimeout(async () => {
+    const v = (isWalk ? walkins : checkins)[id]; if (!v) { delete pendingPlus[id]; return; }
+    if (isWalk) await store.setWalkin(id, v); else await store.setCheckin(id, v);
+    delete pendingPlus[id];
+  }, 500);
+}
+const armed = {};
+function undo(id, isWalk, btn){
+  if (!armed[id]) {
+    armed[id] = setTimeout(() => { delete armed[id]; render(); }, 3000);
+    render(); return;
+  }
+  clearTimeout(armed[id]); delete armed[id]; delete pendingPlus[id];
+  if (isWalk) store.setWalkin(id, null); else store.setCheckin(id, null);
+}
+
+// ---------- render ----------
+function hl(text, tokens){
+  let out = esc(text);
+  if (!tokens.length) return out;
+  const n = norm(text);
+  // find ranges in normalized text (same length as original for latin chars after NFD strip? not always) -> fallback simple
+  if (n.length !== text.length) return out;
+  const marks = new Array(text.length).fill(false);
+  tokens.forEach(t => { let i = n.indexOf(t); while (i>-1){ for(let k=i;k<i+t.length;k++) marks[k]=true; i = n.indexOf(t, i+t.length);} });
+  let res = '', open = false;
+  for (let i=0;i<text.length;i++){
+    if (marks[i] && !open){ res += '<mark>'; open = true; }
+    if (!marks[i] && open){ res += '</mark>'; open = false; }
+    res += esc(text[i]);
+  }
+  if (open) res += '</mark>';
+  return res;
+}
+
+function allPeople(){
+  const w = Object.entries(walkins).map(([id,v]) => ({id, p:v.p, n:v.n, c:v.c||'', r:'', e:'', walk:true, h:norm(v.p+' '+v.n+' '+(v.c||''))}));
+  return GUESTS.concat(w);
+}
+
+function render(){
+  const tokens = norm(query).split(/\s+/).filter(Boolean);
+  const people = allPeople();
+  const isIn = x => x.walk || !!checkins[x.id];
+
+  // stats
+  const inGuests = GUESTS.filter(g => checkins[g.id]).length;
+  const plusG = Object.values(checkins).reduce((s,v)=>s+(v.plus||0),0);
+  const wl = Object.values(walkins);
+  const plusW = wl.reduce((s,v)=>s+(v.plus||0),0);
+  const plus = plusG + plusW;
+  const room = inGuests + wl.length + plus;
+  $('count').innerHTML = `${inGuests}<small> / ${GUESTS.length}</small>`;
+  const parts = [`<b>${inGuests}</b> inscrit${inGuests>1?'s':''} arrivé${inGuests>1?'s':''}`];
+  if (plus) parts.push(`<b>${plus}</b> accompagnant${plus>1?'s':''}`);
+  if (wl.length) parts.push(`<b>${wl.length}</b> hors liste`);
+  $('summary').innerHTML = GUESTS.length ? `${parts.join(', ')}.<br><b>${room}</b> personne${room>1?'s':''} sur place au total.` : 'Aucune liste importée.';
+  $('bar').style.width = (GUESTS.length ? (inGuests/GUESTS.length*100) : 0) + '%';
+  $('nAll').textContent = people.length;
+  $('nTodo').textContent = GUESTS.length - inGuests;
+  $('nIn').textContent = inGuests + wl.length;
+
+  let rows = people.filter(x => tokens.every(t => x.h.includes(t)));
+  if (filter === 'todo') rows = rows.filter(x => !isIn(x));
+  if (filter === 'in') {
+    rows = rows.filter(isIn);
+    const at = x => (x.walk ? walkins[x.id]?.at : checkins[x.id]?.at) || '';
+    rows.sort((a,b) => at(b).localeCompare(at(a)));
+  } else if (!tokens.length) {
+    rows.sort(byName);
+  } else {
+    // search: not-yet-arrived first, then name
+    rows.sort((a,b) => (isIn(a)-isIn(b)) || byName(a,b));
+  }
+
+  const shown = rows.slice(0, limit);
+  $('list').innerHTML = shown.map(x => {
+    const rec = x.walk ? walkins[x.id] : checkins[x.id];
+    const meta = [x.c, x.r].filter(Boolean).join(', ') || (x.walk ? '' : 'Entreprise non renseignée');
+    const tag = x.walk ? '<span class="tag">Hors liste</span>' : '';
+    const name = `<div class="name">${hl(x.p+' '+x.n, tokens)}${tag}</div>`;
+    if (!rec) {
+      return `<li class="row"><div class="who">${name}<div class="meta">${hl(meta,tokens)}</div></div>
+        <div class="right"><button class="btn btn-primary" data-act="in" data-id="${x.id}">Arrivé</button></div></li>`;
+    }
+    const plus = rec.plus||0;
+    return `<li class="row in"><div class="who">${name}<div class="meta">${hl(meta,tokens)}</div>
+        <div class="status">Arrivé·e à ${hhmm(rec.at)}${plus?`, +${plus} accompagnant${plus>1?'s':''}`:''}</div></div>
+      <div class="right">
+        <div class="stepper" aria-label="Accompagnants">
+          <button data-act="minus" data-id="${x.id}" data-w="${x.walk?1:0}" ${plus?'':'disabled'} aria-label="Retirer un accompagnant">−</button>
+          <output>+${plus}</output>
+          <button data-act="plus" data-id="${x.id}" data-w="${x.walk?1:0}" aria-label="Ajouter un accompagnant">+</button>
+        </div>
+        <button class="undo ${armed[x.id]?'armed':''}" data-act="undo" data-id="${x.id}" data-w="${x.walk?1:0}">${armed[x.id]?'Confirmer ?':'Annuler'}</button>
+      </div></li>`;
+  }).join('');
+
+  $('more').hidden = rows.length <= limit;
+  $('more').textContent = `Afficher plus (${rows.length - limit} restants)`;
+
+  let empty = '';
+  if (!rows.length) {
+    if (tokens.length) empty = `<div class="empty">Personne ne correspond à « ${esc(query)} ».<br>Essayez avec le prénom seul ou l'entreprise.<br>
+      <button class="btn btn-primary" data-act="walk">Ajouter ${esc(query)} hors liste</button></div>`;
+    else if (filter==='in') empty = `<div class="empty">Aucune arrivée pour l'instant.</div>`;
+    else empty = `<div class="empty">Tout le monde est arrivé.</div>`;
+  }
+  $('emptyBox').innerHTML = empty;
+}
+
+// ---------- toast ----------
+let tt;
+function toast(msg, err){
+  const t = $('toast'); t.textContent = msg; t.classList.toggle('err', !!err);
+  t.classList.add('show'); clearTimeout(tt); tt = setTimeout(()=>t.classList.remove('show'), err?4500:2200);
+}
+
+// ---------- events ----------
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = b.dataset.id, w = b.dataset.w === '1';
+  switch (b.dataset.act) {
+    case 'in': checkIn(id); break;
+    case 'plus': changePlus(id, +1, w); break;
+    case 'minus': changePlus(id, -1, w); break;
+    case 'undo': undo(id, w, b); break;
+    case 'walk': openWalk(query); break;
+  }
+});
+$('q').addEventListener('input', e => { query = e.target.value; limit = PAGE; $('clear').classList.toggle('show', !!query); render(); });
+$('clear').addEventListener('click', () => { query=''; $('q').value=''; $('clear').classList.remove('show'); limit=PAGE; render(); $('q').focus(); });
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+  filter = c.dataset.f; limit = PAGE;
+  document.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', x===c ? 'true':'false'));
+  render();
+  if (sb.getBoundingClientRect().top <= 0) window.scrollTo({top: document.querySelector('.hero').offsetTop + document.querySelector('.hero').offsetHeight - 4});
+}));
+$('more').addEventListener('click', () => { limit += PAGE; render(); });
+$('q').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+const sb = document.querySelector('.searchbar');
+new IntersectionObserver(([e]) => sb.classList.toggle('stuck', e.intersectionRatio < 1), {threshold:[1]}).observe(document.querySelector('.hero'));
+$('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });
+
+// walk-in dialog
+let wPlus = 0;
+function setWPlus(v){ wPlus = Math.max(0, Math.min(9, v)); $('wPlus').textContent = '+'+wPlus; $('wMinus').disabled = !wPlus; }
+function openWalk(prefill){
+  const parts = (prefill||'').trim().split(/\s+/).filter(Boolean);
+  $('wp').value = parts[0] ? parts[0][0].toUpperCase()+parts[0].slice(1) : '';
+  $('wn').value = parts.slice(1).join(' ');
+  $('wc').value = ''; setWPlus(0);
+  $('dlg').showModal(); if (matchMedia('(min-width:720px)').matches || parts.length===0) (parts.length ? $('wc') : $('wp')).focus(); else document.activeElement.blur();
+}
+$('addBtn').addEventListener('click', () => openWalk(query));
+$('wMinus').addEventListener('click', () => setWPlus(wPlus-1));
+$('wAdd').addEventListener('click', () => setWPlus(wPlus+1));
+$('wCancel').addEventListener('click', () => $('dlg').close());
+$('walkForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const p = $('wp').value.trim(), n = $('wn').value.trim();
+  if (!p || !n) return;
+  const id = 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  store.setWalkin(id, {p, n, c:$('wc').value.trim(), at:new Date().toISOString(), plus:wPlus});
+  $('dlg').close();
+  query=''; $('q').value=''; $('clear').classList.remove('show');
+  toast(`${p} ${n} ajouté·e et arrivé·e`);
+});
+
+// export
+$('exportBtn').addEventListener('click', async () => {
+  const cell = v => { v = String(v??''); return /[;"\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const lines = [['Statut','Source','Prénom','Nom','Entreprise','Poste','Email','Heure d\'arrivée','Accompagnants'].join(';')];
+  GUESTS.slice().sort(byName).forEach(g => {
+    const r = checkins[g.id];
+    lines.push([r?'Arrivé':'Absent','Liste',g.p,g.n,g.c,g.r,g.e,r?hhmm(r.at):'',r?(r.plus||0):''].map(cell).join(';'));
+  });
+  Object.values(walkins).forEach(w => {
+    lines.push(['Arrivé','Hors liste',w.p,w.n,w.c,'','',hhmm(w.at),w.plus||0].map(cell).join(';'));
+  });
+  const csv = '\ufeff' + lines.join('\r\n');
+  const filename = 'presences-tpc-summit-edge-of-ai.csv';
+  let dl = null;
+  try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch(e){}
+  if (dl) {
+    try { await dl.save({filename, data: csv}); }
+    catch(e){ if (e && e.code !== 'declined') toast("Export impossible depuis cet appareil.", true); }
+    return;
+  }
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+    a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  } catch(e){ toast("Export impossible depuis cet appareil.", true); }
+});
+
+// ---------- boot ----------
+try { const saved = JSON.parse(localStorage.getItem(LS_GUESTS) || '[]'); setGuests(saved, false); } catch(e){ setGuests([], false); }
+$('csvFile').addEventListener('change', e => { importFile(e.target.files[0]); e.target.value=''; });
+$('csvFile2').addEventListener('change', e => { importFile(e.target.files[0]); e.target.value=''; });
+loadLocal();
+store = localStore;
+setSync('local');
+render();
+initDb().then(ok => {
+  if (!ok) { setSync('local'); $('footNote').textContent = "Les arrivées sont enregistrées dans ce navigateur, sur cet appareil."; }
+  else { $('footNote').textContent = ''; }
+});
+</script>
+</body>
+</html>
