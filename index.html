@@ -282,13 +282,14 @@ let GUESTS = [];
 const LS_CACHE = 'tpc-summit-edge-ai-cache-v2';
 const LS_CODE = 'tpc-summit-edge-ai-code';
 const PAGE = 60;
-const POLL_MS = 5000;
+const POLL_MS = 6000;
 
 // ---------- state ----------
 let checkins = {};   // pageId -> {at, plus}
 let walkins = {};    // pageId (ou tmp-…) -> {p,n,c,at,plus}
 let filter = 'all', query = '', limit = PAGE;
 let loaded = false;
+let loadError = '';
 const dirty = {};    // pageId -> échéance (ms) pendant laquelle la valeur locale prime
 const pendingCreate = {}; // tmpId -> Promise<pageId>
 
@@ -302,11 +303,21 @@ const markDirty = id => { dirty[id] = Date.now() + 15000; };
 let code = ''; try { code = localStorage.getItem(LS_CODE) || ''; } catch(e){}
 
 // ---------- API ----------
-async function api(path, opts = {}){
-  const r = await fetch(path, {...opts, headers: {'Content-Type':'application/json', 'x-access-code': code, ...(opts.headers||{})}});
+// API n8n (requêtes "simples" : pas de pré-vérification CORS, fonctionne depuis n'importe quel hébergeur)
+const API = 'https://n8n.srv1267950.hstgr.cloud/webhook/accueil-summit';
+async function api(route, payload){
+  let r;
+  if (payload === undefined) {
+    r = await fetch(API + '/' + route + '?k=' + encodeURIComponent(code), {cache: 'no-store'});
+  } else {
+    const body = new URLSearchParams({k: code});
+    for (const [key, val] of Object.entries(payload)) body.append(key, val == null ? '' : String(val));
+    r = await fetch(API + '/' + route, {method: 'POST', body});
+  }
   if (r.status === 401) { showLock(); const e = new Error('code'); e.code = 'locked'; throw e; }
   let data = null; try { data = await r.json(); } catch(e){}
-  if (!r.ok) throw new Error((data && data.error) || ('Erreur ' + r.status));
+  if (!r.ok) throw new Error((data && (data.error || data.message)) || ('Erreur ' + r.status + ' du serveur n8n'));
+  if (data == null) throw new Error("Réponse vide du serveur n8n : vérifiez que le workflow est publié.");
   return data;
 }
 
@@ -332,11 +343,11 @@ async function refresh(){
   if (polling || needsCode) return;
   polling = true;
   try {
-    const d = await api('/api/guests?k=' + encodeURIComponent(code));
+    const d = await api('guests');
     applyServer(d.guests || []);
     try { localStorage.setItem(LS_CACHE, JSON.stringify(d.guests || [])); } catch(e){}
-    setSync('live'); render();
-  } catch(e){ if (e.code !== 'locked') setSync('err'); }
+    loadError = ''; setSync('live'); render();
+  } catch(e){ if (e.code !== 'locked') { loadError = e.message || 'Erreur inconnue'; setSync('err'); render(); } }
   finally { polling = false; }
 }
 
@@ -354,7 +365,7 @@ const store = {
   async setCheckin(id, v){
     if (v) checkins[id] = v; else delete checkins[id];
     markDirty(id); render();
-    await write(() => api('/api/checkin', {method:'POST', body: JSON.stringify({id, venu: !!v, at: v ? v.at : null, plus: v ? (v.plus||0) : 0})}));
+    await write(() => api('checkin', {id, venu: v ? '1' : '0', at: v ? v.at : '', plus: v ? (v.plus||0) : 0}));
   },
   async setWalkin(id, v){
     if (v) walkins[id] = v; else delete walkins[id];
@@ -362,22 +373,22 @@ const store = {
     if (id.startsWith('tmp-')) {
       if (!pendingCreate[id]) {
         const create = v;
-        pendingCreate[id] = api('/api/walkin', {method:'POST', body: JSON.stringify(create)}).then(r => r.id);
+        pendingCreate[id] = api('walkin', {p: create.p, n: create.n, c: create.c || '', at: create.at, plus: create.plus || 0}).then(r => r.id);
         let realId = null;
         await write(async () => { realId = await pendingCreate[id]; });
         if (!realId) { delete pendingCreate[id]; return; }
         // remplace l'identifiant provisoire par celui de Notion
         const cur = walkins[id]; delete walkins[id];
         if (cur) { walkins[realId] = cur; markDirty(realId); render();
-          if ((cur.plus||0) !== (create.plus||0)) await write(() => api('/api/checkin', {method:'POST', body: JSON.stringify({id: realId, venu: true, at: cur.at, plus: cur.plus||0})}));
-        } else { await write(() => api('/api/walkin?id=' + encodeURIComponent(realId), {method:'DELETE'})); }
+          if ((cur.plus||0) !== (create.plus||0)) await write(() => api('checkin', {id: realId, venu: '1', at: cur.at, plus: cur.plus||0}));
+        } else { await write(() => api('walkin-delete', {id: realId})); }
         delete pendingCreate[id];
         return;
       }
       return; // création en cours : la suite est traitée à la fin de la création
     }
-    if (v) await write(() => api('/api/checkin', {method:'POST', body: JSON.stringify({id, venu: true, at: v.at, plus: v.plus||0})}));
-    else await write(() => api('/api/walkin?id=' + encodeURIComponent(id), {method:'DELETE'}));
+    if (v) await write(() => api('checkin', {id, venu: '1', at: v.at, plus: v.plus||0}));
+    else await write(() => api('walkin-delete', {id}));
   }
 };
 
@@ -509,7 +520,7 @@ function render(){
   $('more').textContent = `Afficher plus (${rows.length - limit} restants)`;
 
   let empty = '';
-  if (!loaded) empty = `<div class="empty">Chargement de la liste…</div>`;
+  if (!loaded) empty = loadError ? `<div class="empty"><b>Impossible de charger la liste.</b><br>${esc(loadError)}</div>` : `<div class="empty">Chargement de la liste…</div>`;
   else if (!rows.length) {
     if (tokens.length) empty = `<div class="empty">Personne ne correspond à « ${esc(query)} ».<br>Essayez avec le prénom ou le nom seul.<br>
       <button class="btn btn-primary" data-act="walk">Ajouter ${esc(query)} hors liste</button></div>`;
