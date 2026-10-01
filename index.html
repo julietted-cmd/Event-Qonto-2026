@@ -186,6 +186,15 @@ dialog::backdrop{background:rgba(3,2,35,.55)}
   .toast{left:50%;right:auto;transform:translate(-50%,20px);max-width:480px}
   .toast.show{transform:translate(-50%,0)}
 }
+/* code d'accès */
+.lock{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;align-items:center;justify-content:center;padding:24px}
+.lock.show{display:flex}
+.lock form{width:100%;max-width:360px;text-align:center}
+.lock h2{margin:0 0 6px;font-size:22px}
+.lock p{margin:0 0 18px;color:var(--muted);font-size:15px}
+.lock input{width:100%;height:56px;border-radius:14px;border:2px solid var(--line);background:var(--surface);padding:0 16px;font-size:20px;text-align:center;letter-spacing:.08em;margin-bottom:12px}
+.lock input:focus{outline:none;border-color:var(--action)}
+.lock .btn{width:100%;height:54px}
 @media (hover:hover){
   .btn-primary:hover{background:var(--action-hover)}
 }
@@ -259,113 +268,129 @@ dialog::backdrop{background:rgba(3,2,35,.55)}
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+<div class="lock" id="lock">
+  <form id="lockForm">
+    <h2>Code d'accès</h2>
+    <p>Saisissez le code communiqué à l'équipe d'accueil.</p>
+    <input id="lockCode" type="password" inputmode="text" autocomplete="off" autocapitalize="off" aria-label="Code d'accès" required>
+    <button class="btn btn-primary" type="submit">Accéder à la liste</button>
+  </form>
+</div>
+
 <script>
-const GUESTS = [{"id":"g000","p":"Kilian","n":"Hauray"},{"id":"g001","p":"Arnaud","n":"Rosier"},{"id":"g002","p":"Flore","n":"Morin"},{"id":"g003","p":"Dorsaf","n":"Fayech"},{"id":"g004","p":"Seb","n":"Warembourg"},{"id":"g005","p":"Margot","n":"Le Morvan"},{"id":"g006","p":"Tony","n":"Cerqueira"},{"id":"g007","p":"Julien","n":"Delbourg"},{"id":"g008","p":"Frédéric","n":"Ocana"},{"id":"g009","p":"Tom","n":"Tinel"},{"id":"g010","p":"Alexandre","n":"Bouaniche"},{"id":"g011","p":"Gwénolé","n":"Floc'h"},{"id":"g012","p":"Karlo","n":"Anton"},{"id":"g013","p":"Diane","n":"Sempéré"},{"id":"g014","p":"Audrey","n":"Meyronne"},{"id":"g015","p":"Franck","n":"Pizzagalli"},{"id":"g016","p":"Tamara","n":"Samaha"},{"id":"g017","p":"Maëlys","n":"Beulque"},{"id":"g018","p":"Gabriel","n":"Avedikian"},{"id":"g019","p":"Tara","n":"Wickart"},{"id":"g020","p":"Bartosz","n":"Jakubowski"},{"id":"g021","p":"Clemence","n":"Coghlan"},{"id":"g022","p":"Ahmad","n":"Kanj"},{"id":"g023","p":"Joséphine","n":"Gautié"},{"id":"g024","p":"Sylvie","n":"Da Costa Espinho"},{"id":"g025","p":"Vincent","n":"Vannha"},{"id":"g026","p":"Anaïs","n":"Delgado"},{"id":"g027","p":"Jean-Daniel","n":"Vouille"},{"id":"g028","p":"Gabriel","n":"Alphen-Ginet"},{"id":"g029","p":"Imane","n":"Bellachehab"},{"id":"g030","p":"Fatimazahrae","n":"Abbadi"},{"id":"g031","p":"Diana","n":"Kupriienko"},{"id":"g032","p":"Tom","n":"Bourgouin"},{"id":"g033","p":"Michael","n":"Caylus"},{"id":"g034","p":"Mike","n":"Aidane"},{"id":"g035","p":"Matthieu","n":"Birach"},{"id":"g036","p":"Claire-Lise","n":"Colin"},{"id":"g037","p":"Vincent","n":"Chaquin"},{"id":"g038","p":"Cesar","n":"Miguel"},{"id":"g039","p":"Xavier","n":"Ridet"},{"id":"g040","p":"Clara","n":"Sasportes"},{"id":"g041","p":"Solène","n":"Doukhan"},{"id":"g042","p":"Ludovic","n":"Bordes"},{"id":"g043","p":"Alexandre","n":"Heraud"},{"id":"g044","p":"Morgane","n":"Vatin"},{"id":"g045","p":"Juliette","n":"Boudard"},{"id":"g046","p":"Pauline","n":"Minary"},{"id":"g047","p":"Kamel","n":"Zeroual"},{"id":"g048","p":"Felix","n":"Genatio"},{"id":"g049","p":"Paul-Louis","n":"Palluel"},{"id":"g050","p":"Henri","n":"Giroussens"},{"id":"g051","p":"Anais","n":"Busson"},{"id":"g052","p":"Ugo","n":"Castellazzi"},{"id":"g053","p":"Rasha","n":"Amin"},{"id":"g054","p":"Yannick","n":"Haudry"},{"id":"g055","p":"Laurène","n":"Semedo"},{"id":"g056","p":"Bruno","n":"Maillot"},{"id":"g057","p":"Marius","n":"Relier"},{"id":"g058","p":"Jordan","n":"Vidal"},{"id":"g059","p":"Margot","n":"Demeester"},{"id":"g060","p":"Arthur","n":"Coste"},{"id":"g061","p":"Alexandre","n":"Peyre"},{"id":"g062","p":"Vincent","n":"Ducrohet"},{"id":"g063","p":"Delphine","n":"Magne"},{"id":"g064","p":"Alice","n":"Rebert"},{"id":"g065","p":"Charlotte","n":"Moreau"},{"id":"g066","p":"Geoffroy","n":"de Boissieu"},{"id":"g067","p":"Alexis","n":"Vassilopoulos"},{"id":"g068","p":"Morgan","n":"Fourny"},{"id":"g069","p":"Yolande","n":"Anol"},{"id":"g070","p":"Johann","n":"Sosnowicz"},{"id":"g071","p":"Aymen","n":"Baccouchi"},{"id":"g072","p":"Adrien","n":"Bono"},{"id":"g073","p":"Benjamin","n":"Jailly"},{"id":"g074","p":"Numa","n":"Lecomte"},{"id":"g075","p":"Victor","n":"Barnouin"},{"id":"g076","p":"Veronique","n":"Colbert"},{"id":"g077","p":"Vahritch","n":"Kharmendjian"},{"id":"g078","p":"Romain","n":"Affanni"},{"id":"g079","p":"Yannick","n":"Borgomano"},{"id":"g080","p":"Lola","n":"Oketokoun"},{"id":"g081","p":"Hamza","n":"Mahrouch"},{"id":"g082","p":"Pierre","n":"Delannoy"},{"id":"g083","p":"Helmi","n":"Bouhlel"},{"id":"g084","p":"Lucie","n":"Imbert"},{"id":"g085","p":"Maxime","n":"Balme"},{"id":"g086","p":"Marine","n":"Lahogue"},{"id":"g087","p":"Antoine","n":"Perrin"},{"id":"g088","p":"Tess","n":"Cely"},{"id":"g089","p":"Romain","n":"Fouilland"},{"id":"g090","p":"Capucine","n":"Doin"},{"id":"g091","p":"Margaux","n":"Ehrmann"},{"id":"g092","p":"Joelle","n":"Huy"},{"id":"g093","p":"Garine","n":"Loussararian"},{"id":"g094","p":"Josquin","n":"Farge"},{"id":"g095","p":"Ahmed","n":"Abbessi"},{"id":"g096","p":"Richard","n":"Bertrand"},{"id":"g097","p":"François","n":"Kergaravat"},{"id":"g098","p":"David","n":"Vanpeene"},{"id":"g099","p":"Maxime","n":"Michel"},{"id":"g100","p":"Minh-Tho","n":"Dao"},{"id":"g101","p":"Jérémy","n":"Chamoux"},{"id":"g102","p":"Teresa","n":"Karrer"},{"id":"g103","p":"Jeremie","n":"Lebrun"},{"id":"g104","p":"Melissa","n":"Atienza"},{"id":"g105","p":"Sarah","n":"Bouin"},{"id":"g106","p":"Guillaume","n":"Grillat"},{"id":"g107","p":"Ismael","n":"Prigent"},{"id":"g108","p":"Sandrine","n":"Schutt"},{"id":"g109","p":"Marie","n":"Pastré"},{"id":"g110","p":"Benoit","n":"Vinceneux"},{"id":"g111","p":"Raphael","n":"Jouin"},{"id":"g112","p":"Eléonore","n":"Breton"},{"id":"g113","p":"Sophie","n":"Pilverdier"},{"id":"g114","p":"Gabriel","n":"Delattre"},{"id":"g115","p":"Antoine","n":"Bertin"},{"id":"g116","p":"Julien","n":"Paris"},{"id":"g117","p":"Ben","n":"Thameur"},{"id":"g118","p":"Gregoire","n":"Sentis"},{"id":"g119","p":"Sébastien","n":"Boulle"},{"id":"g120","p":"Myriam","n":"Breton"},{"id":"g121","p":"Patrice","n":"Yazbek"},{"id":"g122","p":"Marc","n":"Giraud"},{"id":"g123","p":"Renaud","n":"Couzin"},{"id":"g124","p":"Galaxy","n":"Nguyen"},{"id":"g125","p":"Rayane","n":"Bendjelida"},{"id":"g126","p":"Romain","n":"Lenoir"},{"id":"g127","p":"Léa","n":"Haran"},{"id":"g128","p":"Elsa","n":"Anselmet"},{"id":"g129","p":"Loane","n":"Watrelot"},{"id":"g130","p":"Stéphane","n":"Begin"},{"id":"g131","p":"Joan","n":"Burkovic"},{"id":"g132","p":"Nicolas","n":"Szczepaniak"},{"id":"g133","p":"Alexandra","n":"Lung"},{"id":"g134","p":"Ines","n":"Duplessis"},{"id":"g135","p":"Chloé","n":"Maumont"},{"id":"g136","p":"Nelly","n":"Rousseau"},{"id":"g137","p":"Jose","n":"Lujan Hoffmann"},{"id":"g138","p":"Thomas","n":"Muller"},{"id":"g139","p":"Maël","n":"Bourhis"},{"id":"g140","p":"Alexandre","n":"Mathieu"},{"id":"g141","p":"Laure","n":"Joly"},{"id":"g142","p":"Olivier","n":"van Stratum"},{"id":"g143","p":"Joseph","n":"Quercia"},{"id":"g144","p":"Alexandre","n":"Pineau"},{"id":"g145","p":"Emeric","n":"Kubiak"},{"id":"g146","p":"Paul","n":"Lodola"},{"id":"g147","p":"Pierre","n":"Bidet"},{"id":"g148","p":"Florian","n":"Causse"},{"id":"g149","p":"Rome","n":"Sassi"},{"id":"g150","p":"Jerome","n":"Douret"},{"id":"g151","p":"Emmanuelle","n":"Kiss"},{"id":"g152","p":"Camille","n":"Fourteau"},{"id":"g153","p":"Bertrand","n":"Domas"},{"id":"g154","p":"Victor","n":"Dulieu"},{"id":"g155","p":"Marion","n":"Mohan"},{"id":"g156","p":"Cyrille","n":"Magnetto"},{"id":"g157","p":"Claire","n":"Durand"},{"id":"g158","p":"Mathieu","n":"Campi"},{"id":"g159","p":"Aurélie","n":"Chauvé"},{"id":"g160","p":"Deborah","n":"Caldeira"},{"id":"g161","p":"Laurent","n":"Vaillant"},{"id":"g162","p":"Hans","n":"Raj Kumar"},{"id":"g163","p":"Capucine","n":"Marteau"},{"id":"g164","p":"Kevin","n":"Mameri"},{"id":"g165","p":"Cédric","n":"Marteau"},{"id":"g166","p":"Malo","n":"Allée"},{"id":"g167","p":"Quentin","n":"Pélabon"},{"id":"g168","p":"Alexandre","n":"Gerard"},{"id":"g169","p":"Grégoire","n":"Mielle"},{"id":"g170","p":"Paul","n":"Dervaux"},{"id":"g171","p":"Aochen","n":"Yang"},{"id":"g172","p":"Julien","n":"Clement"},{"id":"g173","p":"Jérémy","n":"Payan"},{"id":"g174","p":"Cory","n":"Chaplin"},{"id":"g175","p":"Enrique","n":"Sellem"},{"id":"g176","p":"Cedric","n":"Blanchard"},{"id":"g177","p":"Madhu","n":"Desbois"},{"id":"g178","p":"Quentin","n":"Hennebelle"},{"id":"g179","p":"Antoine","n":"Despujols"},{"id":"g180","p":"Julien","n":"Du"},{"id":"g181","p":"François","n":"Uhl"},{"id":"g182","p":"Justine","n":"Stackler"},{"id":"g183","p":"Samuel","n":"Kabbaj"},{"id":"g184","p":"Aurelie","n":"Desvigne"},{"id":"g185","p":"Anais","n":"Ricci"},{"id":"g186","p":"Nicolas","n":"Simon"},{"id":"g187","p":"Camille","n":"Goni"},{"id":"g188","p":"Pascal","n":"Lorne"},{"id":"g189","p":"Aurelien","n":"Francois"},{"id":"g190","p":"Marc-Antoine","n":"Baer"},{"id":"g191","p":"Lamia","n":"Benaouali"},{"id":"g192","p":"Romain","n":"Gerard"},{"id":"g193","p":"Matthieu","n":"Cahu"},{"id":"g194","p":"Mathilde","n":"Rigabert"},{"id":"g195","p":"Maxence","n":"Bruyas"},{"id":"g196","p":"Fatiha","n":"Achour"},{"id":"g197","p":"Alya","n":"Yacoubi"},{"id":"g198","p":"Youssef","n":"Meddeb"},{"id":"g199","p":"Lea","n":"Hijazi"},{"id":"g200","p":"Kévin","n":"Duthoit"},{"id":"g201","p":"Eleonore","n":"Serge"},{"id":"g202","p":"Fabien","n":"Punin"},{"id":"g203","p":"Hugo","n":"Arnoult"},{"id":"g204","p":"Marine","n":"Wetzel"},{"id":"g205","p":"Arom","n":"Phanphengdy"},{"id":"g206","p":"Mikael","n":"Coste"},{"id":"g207","p":"Anthony","n":"Chollet"},{"id":"g208","p":"Anto","n":"Dominic"},{"id":"g209","p":"Daniela","n":"Ciolac"},{"id":"g210","p":"Astrid","n":"de Pelleport"},{"id":"g211","p":"Simon","n":"Gheeraert"},{"id":"g212","p":"Sebastien","n":"Faure"},{"id":"g213","p":"Nicola","n":"Carli"},{"id":"g214","p":"Valentin","n":"Petitjean"},{"id":"g215","p":"Rob","n":"Define"},{"id":"g216","p":"Olga","n":"Besson"},{"id":"g217","p":"Laura","n":"Ville"},{"id":"g218","p":"Nathan","n":"Chauliac"},{"id":"g219","p":"Loïc","n":"Monthorin"},{"id":"g220","p":"Gaetan","n":"Ickx"},{"id":"g221","p":"Rémy","n":"Balangué"},{"id":"g222","p":"Laure","n":"Bonfils"},{"id":"g223","p":"Benjamin","n":"Lassus"},{"id":"g224","p":"Ludovic","n":"Jeanson"},{"id":"g225","p":"Marie","n":"Feld"},{"id":"g226","p":"Ombeline","n":"Choupin"},{"id":"g227","p":"Frédéric","n":"Dermer"},{"id":"g228","p":"Antoine","n":"Laffond"},{"id":"g229","p":"Telly","n":"Antonios"},{"id":"g230","p":"Delphine","n":"Zamparini"},{"id":"g231","p":"Roman","n":"Grebnev"},{"id":"g232","p":"Diane-Laure","n":"Delehedde"},{"id":"g233","p":"Raphael","n":"Hdayach"},{"id":"g234","p":"Anne-Christine","n":"Hubault"},{"id":"g235","p":"Ambroise","n":"Drogou"},{"id":"g236","p":"Michel","n":"Dejoux"},{"id":"g237","p":"Vincent","n":"Hurbourque"},{"id":"g238","p":"Benoit","n":"Sibileau"},{"id":"g239","p":"Alexandre","n":"Hollocou"},{"id":"g240","p":"Audrey","n":"Barbier Litvak"},{"id":"g241","p":"Antoine","n":"Rigaudias"},{"id":"g242","p":"Aina","n":"Demirova"},{"id":"g243","p":"Lorraine","n":"Michot"},{"id":"g244","p":"Olivier","n":"Fontenelle"},{"id":"g245","p":"Nicolas","n":"Valencot"},{"id":"g246","p":"Aymeric","n":"Augustin"},{"id":"g247","p":"Clément","n":"Paillasse"},{"id":"g248","p":"Ying","n":"Zhang"},{"id":"g249","p":"Guillaume","n":"Houlette"},{"id":"g250","p":"Thomas","n":"Nathan"},{"id":"g251","p":"Nils","n":"Escurat"},{"id":"g252","p":"Romain","n":"Séchan"},{"id":"g253","p":"Michael","n":"Ben Mergui"},{"id":"g254","p":"Gérald","n":"Grosrenaud"},{"id":"g255","p":"Benjamin","n":"Biancamaria"},{"id":"g256","p":"Sofiane","n":"Belkhodja"},{"id":"g257","p":"Raphaël","n":"Saint-Aubert"},{"id":"g258","p":"Benjamin","n":"Retourné"},{"id":"g259","p":"Paul-Antoine","n":"Campos"},{"id":"g260","p":"Jean-Baptiste","n":"Kaloya"},{"id":"g261","p":"Ying","n":"Zhang"},{"id":"g262","p":"Desi","n":"Damblemont"},{"id":"g263","p":"Delphine","n":"Gras"},{"id":"g264","p":"Timothée","n":"Keck"},{"id":"g265","p":"Orianne","n":"Iwanow"},{"id":"g266","p":"Flo","n":"Arnal"},{"id":"g267","p":"Enzo","n":"Dozias"},{"id":"g268","p":"Meriem","n":"Maaroufi"},{"id":"g269","p":"Claire","n":"Idelot"},{"id":"g270","p":"Florent","n":"Masson"},{"id":"g271","p":"Mario","n":"Vives"},{"id":"g272","p":"Glen","n":"Hellio"},{"id":"g273","p":"Antoine","n":"Visonneau"},{"id":"g274","p":"Kang","n":"Zhang"},{"id":"g275","p":"Romain","n":"Tchertchian"},{"id":"g276","p":"Arthur","n":"Dion"},{"id":"g277","p":"Paul","n":"Carde"},{"id":"g278","p":"Benoit","n":"Lateltin"},{"id":"g279","p":"Gunesh","n":"Dwarika"},{"id":"g280","p":"Brunève","n":"Ishida"},{"id":"g281","p":"Alicia","n":"Carb"},{"id":"g282","p":"Emilie","n":"Mazin"},{"id":"g283","p":"Antonin","n":"Lorain"},{"id":"g284","p":"Sidney","n":"Golstein"},{"id":"g285","p":"Iony","n":"Pali"},{"id":"g286","p":"Christopher","n":"Coleon"},{"id":"g287","p":"Maxime","n":"Nguyen-Them"},{"id":"g288","p":"Pierre-Eric","n":"Boulland"},{"id":"g289","p":"Marie-Lou","n":"Girard"},{"id":"g290","p":"Frédéric","n":"Blanc"},{"id":"g291","p":"Basile","n":"Coyo"},{"id":"g292","p":"Laurent","n":"Pinjon"},{"id":"g293","p":"Pauline","n":"Skinazi"},{"id":"g294","p":"Sarah","n":"Taoudi"},{"id":"g295","p":"Gabriel","n":"Szanto"},{"id":"g296","p":"Abdel","n":"Iazza"},{"id":"g297","p":"Myriam","n":"Mokrani"},{"id":"g298","p":"Lucas","n":"Mageux"},{"id":"g299","p":"Allan","n":"Bruyere"},{"id":"g300","p":"Gilles","n":"Jabot"},{"id":"g301","p":"Marie","n":"de Ubeda"},{"id":"g302","p":"Adriana","n":"Rodrigues"},{"id":"g303","p":"Emmanuelle","n":"Perrier"},{"id":"g304","p":"Victor","n":"Nove"},{"id":"g305","p":"Yanis","n":"Hadjadji"},{"id":"g306","p":"Adrien","n":"Charaix"},{"id":"g307","p":"Antoine","n":"Gantheret"},{"id":"g308","p":"Donia","n":"Baghdadi"},{"id":"g309","p":"Maria","n":"Nehme"},{"id":"g310","p":"Ayman","n":"Rezouk"},{"id":"g311","p":"Alexis","n":"Blandin"},{"id":"g312","p":"Quentin","n":"Farizon"},{"id":"g313","p":"Julien","n":"Perron"},{"id":"g314","p":"Julien","n":"Bes"},{"id":"g315","p":"Jimmy","n":"Wilde"},{"id":"g316","p":"Romain","n":"Mathieu"},{"id":"g317","p":"Bastien","n":"Bigot"},{"id":"g318","p":"Vincent","n":"Ferrand"},{"id":"g319","p":"Hugo","n":"How-Choong"},{"id":"g320","p":"Yann","n":"Le Chatelier"},{"id":"g321","p":"Hervé","n":"Lam"},{"id":"g322","p":"Olivier","n":"Bachard"},{"id":"g323","p":"Thomas","n":"Schersach"},{"id":"g324","p":"Ludi","n":"Akue"},{"id":"g325","p":"Houda","n":"Jemmali"},{"id":"g326","p":"Yolaine","n":"Mercier"},{"id":"g327","p":"Aleksandra","n":"Ristic"},{"id":"g328","p":"Sandy","n":"Goldscheider"},{"id":"g329","p":"Arnaud","n":"Marcel"},{"id":"g330","p":"Aroua","n":"Biri"},{"id":"g331","p":"Thomas","n":"Thieffry"},{"id":"g332","p":"Jacques","n":"Mesnet"},{"id":"g333","p":"Vincent","n":"Schachter"},{"id":"g334","p":"Louis","n":"Duhamel"},{"id":"g335","p":"Etienne","n":"Caldichoury"},{"id":"g336","p":"Matthieu","n":"Guffroy"},{"id":"g337","p":"Olivier","n":"Cauvin"},{"id":"g338","p":"Alban","n":"Bastard Rosset"},{"id":"g339","p":"Valentin","n":"Poddany"},{"id":"g340","p":"François","n":"Fourmentin"},{"id":"g341","p":"Yazid","n":"Hadni"},{"id":"g342","p":"Ibrahim","n":"Mohamed Ali Ag"},{"id":"g343","p":"Emma","n":"Goldblum"},{"id":"g344","p":"Matthieu","n":"Reboul"},{"id":"g345","p":"Marianne","n":"Ducournau"},{"id":"g346","p":"Marwen","n":"Ben Dhahbia"},{"id":"g347","p":"Carlo","n":"d'Halluin"},{"id":"g348","p":"Kaouther","n":"Ben Ouirane"},{"id":"g349","p":"Alexandre","n":"Homo"},{"id":"g350","p":"Gautier","n":"Delache"},{"id":"g351","p":"Yann-Alexis","n":"Thomasset"},{"id":"g352","p":"Xiaoxiang","n":"Liu"},{"id":"g353","p":"Bertrand","n":"Blais"},{"id":"g354","p":"Nacer-eddine","n":"Benhammouda"},{"id":"g355","p":"Mehdi","n":"Pelet"},{"id":"g356","p":"Jérémie","n":"Laboulbene"},{"id":"g357","p":"Guillaume","n":"Fazekas"},{"id":"g358","p":"Maxime","n":"Paulus"},{"id":"g359","p":"William","n":"Tchen"},{"id":"g360","p":"Achille","n":"Gaubert"},{"id":"g361","p":"Arnaud","n":"Glaizal"},{"id":"g362","p":"Caroline","n":"Tailleferd"},{"id":"g363","p":"Mathieu","n":"Niedzwiedz"},{"id":"g364","p":"Elodie","n":"Doll"},{"id":"g368","p":"Laura","n":"Garde"},{"id":"g369","p":"Jean","n":"Hastings"},{"id":"g370","p":"Julie","n":"Colin"},{"id":"g371","p":"Clémentine","n":"Makangila"},{"id":"g372","p":"Fabien","n":"Blanc"},{"id":"g373","p":"Hadrien","n":"De March"},{"id":"g374","p":"Lucas","n":"Boitier"},{"id":"g375","p":"Sebastien","n":"Treguer"},{"id":"g376","p":"Pierre Tarek","n":"Ullrich"}];
-const LS_KEY = 'tpc-summit-edge-ai-checkins-v1';
+let GUESTS = [];
+const LS_CACHE = 'tpc-summit-edge-ai-cache-v2';
+const LS_CODE = 'tpc-summit-edge-ai-code';
 const PAGE = 60;
+const POLL_MS = 5000;
 
 // ---------- state ----------
-let checkins = {};   // id -> {at, plus}
-let walkins = {};    // id -> {p,n,c,at,plus}
+let checkins = {};   // pageId -> {at, plus}
+let walkins = {};    // pageId (ou tmp-…) -> {p,n,c,at,plus}
 let filter = 'all', query = '', limit = PAGE;
-let store = null;    // {setCheckin, setWalkin}
-let mode = 'local';
-const pendingPlus = {};
+let loaded = false;
+const dirty = {};    // pageId -> échéance (ms) pendant laquelle la valeur locale prime
+const pendingCreate = {}; // tmpId -> Promise<pageId>
 
 const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-GUESTS.forEach(g => { g.h = norm(g.p+' '+g.n); });
-const byName = (a,b) => norm(a.n).localeCompare(norm(b.n)) || norm(a.p).localeCompare(norm(b.p));
-GUESTS.sort(byName);
-
+const byName = (a,b) => norm(a.p).localeCompare(norm(b.p)) || norm(a.n).localeCompare(norm(b.n));
 const $ = id => document.getElementById(id);
 const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const hhmm = iso => { try { return new Date(iso).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } };
+const hhmm = iso => { if (!iso) return ''; try { return new Date(iso).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } };
+const markDirty = id => { dirty[id] = Date.now() + 15000; };
 
-// ---------- local fallback ----------
-function loadLocal(){
-  try { const d = JSON.parse(localStorage.getItem(LS_KEY)||'{}'); checkins = d.checkins||{}; walkins = d.walkins||{}; } catch(e){}
+let code = ''; try { code = localStorage.getItem(LS_CODE) || ''; } catch(e){}
+
+// ---------- API ----------
+async function api(path, opts = {}){
+  const r = await fetch(path, {...opts, headers: {'Content-Type':'application/json', 'x-access-code': code, ...(opts.headers||{})}});
+  if (r.status === 401) { showLock(); const e = new Error('code'); e.code = 'locked'; throw e; }
+  let data = null; try { data = await r.json(); } catch(e){}
+  if (!r.ok) throw new Error((data && data.error) || ('Erreur ' + r.status));
+  return data;
 }
-function saveLocal(){
-  try { localStorage.setItem(LS_KEY, JSON.stringify({checkins, walkins})); } catch(e){}
+
+function applyServer(list){
+  const now = Date.now();
+  const g = [], c = {}, w = {};
+  for (const x of list){
+    if (x.walk) w[x.id] = {p:x.p, n:x.n, c:x.c||'', at:x.at, plus:x.plus||0};
+    else { g.push({id:x.id, p:x.p, n:x.n, c:'', r:'', h:norm(x.p+' '+x.n)}); if (x.venu) c[x.id] = {at:x.at, plus:x.plus||0}; }
+  }
+  // les modifications locales récentes priment sur une réponse serveur peut-être en retard
+  for (const id in dirty){
+    if (dirty[id] < now) { delete dirty[id]; continue; }
+    if (id in walkins || id in w) { if (walkins[id]) w[id] = walkins[id]; else delete w[id]; }
+    else { if (checkins[id]) c[id] = checkins[id]; else delete c[id]; }
+  }
+  for (const id in walkins) if (id.startsWith('tmp-')) w[id] = walkins[id];
+  GUESTS = g.sort(byName); checkins = c; walkins = w; loaded = true;
 }
-const localStore = {
-  async setCheckin(id, v){ if (v) checkins[id]=v; else delete checkins[id]; saveLocal(); render(); },
-  async setWalkin(id, v){ if (v) walkins[id]=v; else delete walkins[id]; saveLocal(); render(); }
+
+let polling = false;
+async function refresh(){
+  if (polling || needsCode) return;
+  polling = true;
+  try {
+    const d = await api('/api/guests?k=' + encodeURIComponent(code));
+    applyServer(d.guests || []);
+    try { localStorage.setItem(LS_CACHE, JSON.stringify(d.guests || [])); } catch(e){}
+    setSync('live'); render();
+  } catch(e){ if (e.code !== 'locked') setSync('err'); }
+  finally { polling = false; }
+}
+
+async function write(fn){
+  try { await fn(); return true; }
+  catch(e){
+    if (e.code === 'locked') return false;
+    await new Promise(r => setTimeout(r, 600 + Math.random()*800));
+    try { await fn(); return true; }
+    catch(e2){ toast("Enregistrement impossible, vérifiez la connexion puis réessayez.", true); setSync('err'); return false; }
+  }
+}
+
+const store = {
+  async setCheckin(id, v){
+    if (v) checkins[id] = v; else delete checkins[id];
+    markDirty(id); render();
+    await write(() => api('/api/checkin', {method:'POST', body: JSON.stringify({id, venu: !!v, at: v ? v.at : null, plus: v ? (v.plus||0) : 0})}));
+  },
+  async setWalkin(id, v){
+    if (v) walkins[id] = v; else delete walkins[id];
+    markDirty(id); render();
+    if (id.startsWith('tmp-')) {
+      if (!pendingCreate[id]) {
+        const create = v;
+        pendingCreate[id] = api('/api/walkin', {method:'POST', body: JSON.stringify(create)}).then(r => r.id);
+        let realId = null;
+        await write(async () => { realId = await pendingCreate[id]; });
+        if (!realId) { delete pendingCreate[id]; return; }
+        // remplace l'identifiant provisoire par celui de Notion
+        const cur = walkins[id]; delete walkins[id];
+        if (cur) { walkins[realId] = cur; markDirty(realId); render();
+          if ((cur.plus||0) !== (create.plus||0)) await write(() => api('/api/checkin', {method:'POST', body: JSON.stringify({id: realId, venu: true, at: cur.at, plus: cur.plus||0})}));
+        } else { await write(() => api('/api/walkin?id=' + encodeURIComponent(realId), {method:'DELETE'})); }
+        delete pendingCreate[id];
+        return;
+      }
+      return; // création en cours : la suite est traitée à la fin de la création
+    }
+    if (v) await write(() => api('/api/checkin', {method:'POST', body: JSON.stringify({id, venu: true, at: v.at, plus: v.plus||0})}));
+    else await write(() => api('/api/walkin?id=' + encodeURIComponent(id), {method:'DELETE'}));
+  }
 };
 
-// ---------- shared db ----------
-async function initDb(){
-  const cfg = window.APP_CONFIG || {};
-  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) return false;
-  const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:false}});
-  const toMap = rows => { const m = {}; (rows||[]).forEach(r => { const {id, ...v} = r; m[id] = v; }); return m; };
-
-  async function refresh(){
-    const [c, w] = await Promise.all([
-      sb.from('checkins').select('id,at,plus'),
-      sb.from('walkins').select('id,p,n,c,at,plus')
-    ]);
-    if (c.error || w.error) { setSync('err'); return false; }
-    const m = toMap(c.data);
-    for (const id in pendingPlus) if (m[id]) m[id] = {...m[id], plus: pendingPlus[id]};
-    checkins = m; walkins = toMap(w.data);
-    setSync('live'); render(); return true;
-  }
-  if (!(await refresh())) return false;
-
-  sb.channel('accueil')
-    .on('postgres_changes', {event:'*', schema:'public', table:'checkins'}, p => {
-      if (p.eventType === 'DELETE') delete checkins[p.old.id];
-      else { const {id, ...v} = p.new; checkins[id] = pendingPlus[id] != null ? {...v, plus: pendingPlus[id]} : v; }
-      render();
-    })
-    .on('postgres_changes', {event:'*', schema:'public', table:'walkins'}, p => {
-      if (p.eventType === 'DELETE') delete walkins[p.old.id];
-      else { const {id, ...v} = p.new; walkins[id] = v; }
-      render();
-    })
-    .subscribe(status => {
-      if (status === 'SUBSCRIBED') { setSync('live'); refresh(); }
-      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSync('err');
-    });
-
-  // filet de sécurité : resynchronise régulièrement et au retour sur l'app
-  setInterval(() => { if (!document.hidden) refresh(); }, 20000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-  window.addEventListener('online', refresh);
-
-  const chk = async r => { const { error } = await r; if (error) throw error; };
-  store = {
-    async setCheckin(id, v){
-      if (v) { checkins[id]=v; render(); await write(() => chk(sb.from('checkins').upsert({id, at:v.at, plus:v.plus||0}))); }
-      else { delete checkins[id]; render(); await write(() => chk(sb.from('checkins').delete().eq('id', id))); }
-    },
-    async setWalkin(id, v){
-      if (v) { walkins[id]=v; render(); await write(() => chk(sb.from('walkins').upsert({id, p:v.p, n:v.n, c:v.c||'', at:v.at, plus:v.plus||0}))); }
-      else { delete walkins[id]; render(); await write(() => chk(sb.from('walkins').delete().eq('id', id))); }
-    }
-  };
-  mode = 'db';
-  return true;
-}
-async function write(fn){
-  try { await fn(); }
-  catch(e){
-    await new Promise(r => setTimeout(r, 500 + Math.random()*700));
-    try { await fn(); return; }
-    catch(e2){ toast("Enregistrement impossible, vérifiez la connexion puis réessayez.", true); }
-  }
-}
 function setSync(s){
   const el = $('sync');
   el.classList.toggle('live', s==='live');
   el.querySelector('span').textContent =
     s==='live' ? 'Synchronisé' :
-    s==='err' ? 'Synchro coupée' :
-    'Sur cet appareil';
+    s==='err' ? 'Hors connexion' : 'Connexion…';
 }
+
+let needsCode = false;
+function showLock(){ needsCode = true; $('lock').classList.add('show'); setTimeout(() => $('lockCode').focus(), 50); }
 
 // ---------- actions ----------
 function checkIn(id){
@@ -380,13 +405,12 @@ function changePlus(id, delta, isWalk){
   const next = Math.max(0, Math.min(9, (cur.plus||0) + delta));
   if (next === (cur.plus||0)) return;
   src[id] = {...cur, plus:next};
-  if (!isWalk) pendingPlus[id] = next;
+  markDirty(id);
   render();
   clearTimeout(plusTimers[id]);
   plusTimers[id] = setTimeout(async () => {
-    const v = (isWalk ? walkins : checkins)[id]; if (!v) { delete pendingPlus[id]; return; }
+    const v = (isWalk ? walkins : checkins)[id]; if (!v) return;
     if (isWalk) await store.setWalkin(id, v); else await store.setCheckin(id, v);
-    delete pendingPlus[id];
   }, 500);
 }
 const armed = {};
@@ -395,7 +419,7 @@ function undo(id, isWalk, btn){
     armed[id] = setTimeout(() => { delete armed[id]; render(); }, 3000);
     render(); return;
   }
-  clearTimeout(armed[id]); delete armed[id]; delete pendingPlus[id];
+  clearTimeout(armed[id]); delete armed[id];
   if (isWalk) store.setWalkin(id, null); else store.setCheckin(id, null);
 }
 
@@ -439,7 +463,7 @@ function render(){
   const parts = [`<b>${inGuests}</b> inscrit${inGuests>1?'s':''} arrivé${inGuests>1?'s':''}`];
   if (plus) parts.push(`<b>${plus}</b> accompagnant${plus>1?'s':''}`);
   if (wl.length) parts.push(`<b>${wl.length}</b> hors liste`);
-  $('summary').innerHTML = `${parts.join(', ')}.<br><b>${room}</b> personne${room>1?'s':''} sur place au total.`;
+  $('summary').innerHTML = loaded ? `${parts.join(', ')}.<br><b>${room}</b> personne${room>1?'s':''} sur place au total.` : 'Chargement de la liste…';
   $('bar').style.width = (GUESTS.length ? (inGuests/GUESTS.length*100) : 0) + '%';
   $('nAll').textContent = people.length;
   $('nTodo').textContent = GUESTS.length - inGuests;
@@ -485,7 +509,8 @@ function render(){
   $('more').textContent = `Afficher plus (${rows.length - limit} restants)`;
 
   let empty = '';
-  if (!rows.length) {
+  if (!loaded) empty = `<div class="empty">Chargement de la liste…</div>`;
+  else if (!rows.length) {
     if (tokens.length) empty = `<div class="empty">Personne ne correspond à « ${esc(query)} ».<br>Essayez avec le prénom ou le nom seul.<br>
       <button class="btn btn-primary" data-act="walk">Ajouter ${esc(query)} hors liste</button></div>`;
     else if (filter==='in') empty = `<div class="empty">Aucune arrivée pour l'instant.</div>`;
@@ -545,7 +570,7 @@ $('walkForm').addEventListener('submit', e => {
   e.preventDefault();
   const p = $('wp').value.trim(), n = $('wn').value.trim();
   if (!p || !n) return;
-  const id = 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  const id = 'tmp-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   store.setWalkin(id, {p, n, c:$('wc').value.trim(), at:new Date().toISOString(), plus:wPlus});
   $('dlg').close();
   query=''; $('q').value=''; $('clear').classList.remove('show');
@@ -573,14 +598,20 @@ $('exportBtn').addEventListener('click', async () => {
 });
 
 // ---------- boot ----------
-loadLocal();
-store = localStore;
-setSync('local');
-render();
-initDb().then(ok => {
-  if (!ok) { setSync('local'); $('footNote').textContent = "Synchronisation non configurée : les arrivées restent sur cet appareil (voir config.js)."; }
-  else { $('footNote').textContent = ''; }
+$('lockForm').addEventListener('submit', e => {
+  e.preventDefault();
+  code = $('lockCode').value.trim();
+  try { localStorage.setItem(LS_CODE, code); } catch(err){}
+  needsCode = false; $('lock').classList.remove('show'); $('lockCode').value = '';
+  refresh();
 });
+try { const cached = JSON.parse(localStorage.getItem(LS_CACHE) || 'null'); if (cached) applyServer(cached); } catch(e){}
+setSync(loaded ? 'err' : 'wait');
+render();
+refresh();
+setInterval(() => { if (!document.hidden) refresh(); }, POLL_MS);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+window.addEventListener('online', refresh);
 </script>
 </body>
 </html>

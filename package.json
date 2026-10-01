@@ -1,0 +1,6 @@
+{
+  "name": "accueil-tpc-summit",
+  "private": true,
+  "description": "App d'accueil TPC Summit : pointage des arrivées dans une base Notion",
+  "engines": { "node": ">=18" }
+}
