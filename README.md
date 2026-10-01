@@ -1,24 +1,36 @@
-# Accueil TPC Summit
+# Accueil TPC Summit, Edge of AI
 
-Petite app web pour pointer les arrivées à l'accueil d'un événement : recherche d'un invité par nom, prénom ou entreprise, enregistrement de l'arrivée, ajout d'accompagnants (+1) et de personnes hors liste, puis export CSV des présences.
+App web mobile pour pointer les arrivées : recherche par nom ou prénom, bouton **Arrivé**, accompagnants (+1), ajout de personnes hors liste, export CSV. Les pointages sont partagés en temps réel entre tous les téléphones et conservés si l'app est fermée, grâce à Supabase.
 
-Un seul fichier (`index.html`), sans dépendance ni étape de build. Pensée pour le téléphone, fonctionne aussi sur tablette et ordinateur.
+## Contenu
 
-## Utilisation
+- `index.html` : l'app, avec la liste des 374 inscrits intégrée (prénom et nom uniquement).
+- `config.js` : URL et clé publique Supabase à renseigner.
+- `supabase/schema.sql` : tables et règles à créer dans Supabase.
 
-1. Ouvrir la page (en local ou via GitHub Pages).
-2. Importer la liste des participants au format CSV. Colonnes reconnues : `Prénom`, `Nom`, `Entreprise`, `Poste`, `Email pro` ou `Email d'inscription`. Séparateur virgule ou point-virgule. Voir `exemple-participants.csv`.
-3. À l'accueil : taper quelques lettres, appuyer sur **Arrivé**, ajuster les accompagnants avec − / +.
-4. En fin d'événement : **Exporter les présences (CSV)**.
+## Mise en place (15 minutes)
 
-## Données et confidentialité
+### 1. Supabase
+1. Créer un projet sur supabase.com (ou en réutiliser un).
+2. **SQL Editor > New query**, coller le contenu de `supabase/schema.sql`, cliquer **Run**.
+3. **Project Settings > API** : copier la *Project URL* et la clé *anon public*.
 
-- La liste importée et les arrivées sont stockées dans le navigateur (`localStorage`) de l'appareil. Rien n'est envoyé à un serveur.
-- Aucune liste de participants n'est incluse dans ce dépôt, et le `.gitignore` empêche de committer des fichiers CSV par erreur. Un site GitHub Pages est public : ne jamais y déposer de données personnelles.
-- Chaque appareil a sa propre liste et ses propres pointages. Si plusieurs personnes tiennent l'accueil, exporter le CSV de chaque appareil en fin de soirée et les fusionner.
+### 2. Configuration
+Coller ces deux valeurs dans `config.js`, puis committer.
 
-## Publier sur GitHub Pages
+### 3. Vercel
+1. Pousser le dépôt sur GitHub (privé).
+2. Sur vercel.com : **Add New > Project**, importer le dépôt. Framework preset : **Other**, aucune commande de build, dossier de sortie : racine.
+3. Déployer, puis envoyer l'URL à l'équipe.
 
-1. Créer un dépôt et y pousser ces fichiers.
-2. Dans le dépôt : **Settings → Pages → Build and deployment**, source **Deploy from a branch**, branche `main`, dossier `/ (root)`.
-3. L'app est disponible à `https://<utilisateur>.github.io/<depot>/` après une minute ou deux.
+### 4. Vérifier
+Ouvrir l'URL sur deux téléphones. En haut à droite, chacun doit afficher un point vert **Synchronisé**. Pointer une personne sur l'un : elle doit passer en vert sur l'autre en une ou deux secondes. Fermer et rouvrir l'app : le pointage est toujours là. Annuler le pointage de test.
+
+Si l'app affiche « Sur cet appareil », `config.js` n'est pas rempli ou la connexion à Supabase échoue.
+
+## Bon à savoir
+
+- Le dépôt GitHub est privé, mais le site Vercel est accessible à toute personne qui a l'URL : elle voit les prénoms et noms des inscrits et peut pointer. Ne pas diffuser le lien au-delà de l'équipe d'accueil, et activer si besoin la protection d'accès dans les réglages Vercel du projet.
+- Les emails et postes ne sont volontairement pas dans le dépôt.
+- Les pointages restent dans Supabase après l'événement. Pour les effacer : `truncate public.checkins, public.walkins;`.
+- Ajouter un inscrit : ajouter une entrée `{"id":"gXXX","p":"Prénom","n":"Nom"}` dans la liste `GUESTS` de `index.html`, avec un identifiant jamais utilisé, puis pousser. Vercel redéploie automatiquement.

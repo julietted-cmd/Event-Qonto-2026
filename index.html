@@ -186,15 +186,6 @@ dialog::backdrop{background:rgba(3,2,35,.55)}
   .toast{left:50%;right:auto;transform:translate(-50%,20px);max-width:480px}
   .toast.show{transform:translate(-50%,0)}
 }
-/* import screen */
-.import{display:none;margin:28px 0;padding:22px 18px;border:2px dashed var(--line);border-radius:18px;background:var(--surface);text-align:center}
-.import h2{margin:0 0 6px;font-size:20px}
-.import p{margin:0 auto 16px;color:var(--muted);font-size:15px;line-height:1.45;max-width:46ch}
-.import .btn{width:100%;max-width:360px}
-.import small{display:block;margin-top:12px;color:var(--muted);font-size:13px}
-body.noguests .import{display:block}
-body.noguests .searchbar, body.noguests .list, body.noguests #emptyBox, body.noguests .more, body.noguests .bottombar, body.noguests #exportBtn, body.noguests .linkbtn{display:none}
-.linkbtn{border:0;background:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:13px;padding:8px 0;text-align:left}
 @media (hover:hover){
   .btn-primary:hover{background:var(--action-hover)}
 }
@@ -217,19 +208,10 @@ body.noguests .searchbar, body.noguests .list, body.noguests #emptyBox, body.nog
     <div class="bar"><div id="bar"></div></div>
   </section>
 
-  <section class="import" id="importBox">
-    <h2>Importer la liste des participants</h2>
-    <p>Choisissez le fichier CSV exporté de votre outil d'inscription. Il reste sur cet appareil et n'est envoyé nulle part.</p>
-    <label class="btn btn-primary" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer">
-      Choisir le fichier CSV<input type="file" id="csvFile" accept=".csv,text/csv" hidden>
-    </label>
-    <small>Colonnes reconnues : Prénom, Nom, Entreprise, Poste, Email pro ou Email d'inscription.</small>
-  </section>
-
   <div class="searchbar">
     <div class="search">
       <input id="q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        placeholder="Nom, prénom ou entreprise" aria-label="Rechercher un invité">
+        placeholder="Nom ou prénom" aria-label="Rechercher un invité">
       <button class="clear" id="clear" aria-label="Effacer la recherche">×</button>
     </div>
     <div class="seg" role="group" aria-label="Filtrer">
@@ -246,7 +228,6 @@ body.noguests .searchbar, body.noguests .list, body.noguests #emptyBox, body.nog
   <footer class="foot">
     <button class="btn btn-outline btn-sm" id="exportBtn">Exporter les présences (CSV)</button>
     <span id="footNote"></span>
-    <label class="linkbtn" style="cursor:pointer">Changer de liste<input type="file" id="csvFile2" accept=".csv,text/csv" hidden></label>
   </footer>
 </div>
 
@@ -278,9 +259,10 @@ body.noguests .searchbar, body.noguests .list, body.noguests #emptyBox, body.nog
 
 <div class="toast" id="toast" role="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script>
-let GUESTS = [];
-const LS_GUESTS = 'tpc-summit-edge-ai-guests-v1';
+const GUESTS = [{"id":"g000","p":"Kilian","n":"Hauray"},{"id":"g001","p":"Arnaud","n":"Rosier"},{"id":"g002","p":"Flore","n":"Morin"},{"id":"g003","p":"Dorsaf","n":"Fayech"},{"id":"g004","p":"Seb","n":"Warembourg"},{"id":"g005","p":"Margot","n":"Le Morvan"},{"id":"g006","p":"Tony","n":"Cerqueira"},{"id":"g007","p":"Julien","n":"Delbourg"},{"id":"g008","p":"Frédéric","n":"Ocana"},{"id":"g009","p":"Tom","n":"Tinel"},{"id":"g010","p":"Alexandre","n":"Bouaniche"},{"id":"g011","p":"Gwénolé","n":"Floc'h"},{"id":"g012","p":"Karlo","n":"Anton"},{"id":"g013","p":"Diane","n":"Sempéré"},{"id":"g014","p":"Audrey","n":"Meyronne"},{"id":"g015","p":"Franck","n":"Pizzagalli"},{"id":"g016","p":"Tamara","n":"Samaha"},{"id":"g017","p":"Maëlys","n":"Beulque"},{"id":"g018","p":"Gabriel","n":"Avedikian"},{"id":"g019","p":"Tara","n":"Wickart"},{"id":"g020","p":"Bartosz","n":"Jakubowski"},{"id":"g021","p":"Clemence","n":"Coghlan"},{"id":"g022","p":"Ahmad","n":"Kanj"},{"id":"g023","p":"Joséphine","n":"Gautié"},{"id":"g024","p":"Sylvie","n":"Da Costa Espinho"},{"id":"g025","p":"Vincent","n":"Vannha"},{"id":"g026","p":"Anaïs","n":"Delgado"},{"id":"g027","p":"Jean-Daniel","n":"Vouille"},{"id":"g028","p":"Gabriel","n":"Alphen-Ginet"},{"id":"g029","p":"Imane","n":"Bellachehab"},{"id":"g030","p":"Fatimazahrae","n":"Abbadi"},{"id":"g031","p":"Diana","n":"Kupriienko"},{"id":"g032","p":"Tom","n":"Bourgouin"},{"id":"g033","p":"Michael","n":"Caylus"},{"id":"g034","p":"Mike","n":"Aidane"},{"id":"g035","p":"Matthieu","n":"Birach"},{"id":"g036","p":"Claire-Lise","n":"Colin"},{"id":"g037","p":"Vincent","n":"Chaquin"},{"id":"g038","p":"Cesar","n":"Miguel"},{"id":"g039","p":"Xavier","n":"Ridet"},{"id":"g040","p":"Clara","n":"Sasportes"},{"id":"g041","p":"Solène","n":"Doukhan"},{"id":"g042","p":"Ludovic","n":"Bordes"},{"id":"g043","p":"Alexandre","n":"Heraud"},{"id":"g044","p":"Morgane","n":"Vatin"},{"id":"g045","p":"Juliette","n":"Boudard"},{"id":"g046","p":"Pauline","n":"Minary"},{"id":"g047","p":"Kamel","n":"Zeroual"},{"id":"g048","p":"Felix","n":"Genatio"},{"id":"g049","p":"Paul-Louis","n":"Palluel"},{"id":"g050","p":"Henri","n":"Giroussens"},{"id":"g051","p":"Anais","n":"Busson"},{"id":"g052","p":"Ugo","n":"Castellazzi"},{"id":"g053","p":"Rasha","n":"Amin"},{"id":"g054","p":"Yannick","n":"Haudry"},{"id":"g055","p":"Laurène","n":"Semedo"},{"id":"g056","p":"Bruno","n":"Maillot"},{"id":"g057","p":"Marius","n":"Relier"},{"id":"g058","p":"Jordan","n":"Vidal"},{"id":"g059","p":"Margot","n":"Demeester"},{"id":"g060","p":"Arthur","n":"Coste"},{"id":"g061","p":"Alexandre","n":"Peyre"},{"id":"g062","p":"Vincent","n":"Ducrohet"},{"id":"g063","p":"Delphine","n":"Magne"},{"id":"g064","p":"Alice","n":"Rebert"},{"id":"g065","p":"Charlotte","n":"Moreau"},{"id":"g066","p":"Geoffroy","n":"de Boissieu"},{"id":"g067","p":"Alexis","n":"Vassilopoulos"},{"id":"g068","p":"Morgan","n":"Fourny"},{"id":"g069","p":"Yolande","n":"Anol"},{"id":"g070","p":"Johann","n":"Sosnowicz"},{"id":"g071","p":"Aymen","n":"Baccouchi"},{"id":"g072","p":"Adrien","n":"Bono"},{"id":"g073","p":"Benjamin","n":"Jailly"},{"id":"g074","p":"Numa","n":"Lecomte"},{"id":"g075","p":"Victor","n":"Barnouin"},{"id":"g076","p":"Veronique","n":"Colbert"},{"id":"g077","p":"Vahritch","n":"Kharmendjian"},{"id":"g078","p":"Romain","n":"Affanni"},{"id":"g079","p":"Yannick","n":"Borgomano"},{"id":"g080","p":"Lola","n":"Oketokoun"},{"id":"g081","p":"Hamza","n":"Mahrouch"},{"id":"g082","p":"Pierre","n":"Delannoy"},{"id":"g083","p":"Helmi","n":"Bouhlel"},{"id":"g084","p":"Lucie","n":"Imbert"},{"id":"g085","p":"Maxime","n":"Balme"},{"id":"g086","p":"Marine","n":"Lahogue"},{"id":"g087","p":"Antoine","n":"Perrin"},{"id":"g088","p":"Tess","n":"Cely"},{"id":"g089","p":"Romain","n":"Fouilland"},{"id":"g090","p":"Capucine","n":"Doin"},{"id":"g091","p":"Margaux","n":"Ehrmann"},{"id":"g092","p":"Joelle","n":"Huy"},{"id":"g093","p":"Garine","n":"Loussararian"},{"id":"g094","p":"Josquin","n":"Farge"},{"id":"g095","p":"Ahmed","n":"Abbessi"},{"id":"g096","p":"Richard","n":"Bertrand"},{"id":"g097","p":"François","n":"Kergaravat"},{"id":"g098","p":"David","n":"Vanpeene"},{"id":"g099","p":"Maxime","n":"Michel"},{"id":"g100","p":"Minh-Tho","n":"Dao"},{"id":"g101","p":"Jérémy","n":"Chamoux"},{"id":"g102","p":"Teresa","n":"Karrer"},{"id":"g103","p":"Jeremie","n":"Lebrun"},{"id":"g104","p":"Melissa","n":"Atienza"},{"id":"g105","p":"Sarah","n":"Bouin"},{"id":"g106","p":"Guillaume","n":"Grillat"},{"id":"g107","p":"Ismael","n":"Prigent"},{"id":"g108","p":"Sandrine","n":"Schutt"},{"id":"g109","p":"Marie","n":"Pastré"},{"id":"g110","p":"Benoit","n":"Vinceneux"},{"id":"g111","p":"Raphael","n":"Jouin"},{"id":"g112","p":"Eléonore","n":"Breton"},{"id":"g113","p":"Sophie","n":"Pilverdier"},{"id":"g114","p":"Gabriel","n":"Delattre"},{"id":"g115","p":"Antoine","n":"Bertin"},{"id":"g116","p":"Julien","n":"Paris"},{"id":"g117","p":"Ben","n":"Thameur"},{"id":"g118","p":"Gregoire","n":"Sentis"},{"id":"g119","p":"Sébastien","n":"Boulle"},{"id":"g120","p":"Myriam","n":"Breton"},{"id":"g121","p":"Patrice","n":"Yazbek"},{"id":"g122","p":"Marc","n":"Giraud"},{"id":"g123","p":"Renaud","n":"Couzin"},{"id":"g124","p":"Galaxy","n":"Nguyen"},{"id":"g125","p":"Rayane","n":"Bendjelida"},{"id":"g126","p":"Romain","n":"Lenoir"},{"id":"g127","p":"Léa","n":"Haran"},{"id":"g128","p":"Elsa","n":"Anselmet"},{"id":"g129","p":"Loane","n":"Watrelot"},{"id":"g130","p":"Stéphane","n":"Begin"},{"id":"g131","p":"Joan","n":"Burkovic"},{"id":"g132","p":"Nicolas","n":"Szczepaniak"},{"id":"g133","p":"Alexandra","n":"Lung"},{"id":"g134","p":"Ines","n":"Duplessis"},{"id":"g135","p":"Chloé","n":"Maumont"},{"id":"g136","p":"Nelly","n":"Rousseau"},{"id":"g137","p":"Jose","n":"Lujan Hoffmann"},{"id":"g138","p":"Thomas","n":"Muller"},{"id":"g139","p":"Maël","n":"Bourhis"},{"id":"g140","p":"Alexandre","n":"Mathieu"},{"id":"g141","p":"Laure","n":"Joly"},{"id":"g142","p":"Olivier","n":"van Stratum"},{"id":"g143","p":"Joseph","n":"Quercia"},{"id":"g144","p":"Alexandre","n":"Pineau"},{"id":"g145","p":"Emeric","n":"Kubiak"},{"id":"g146","p":"Paul","n":"Lodola"},{"id":"g147","p":"Pierre","n":"Bidet"},{"id":"g148","p":"Florian","n":"Causse"},{"id":"g149","p":"Rome","n":"Sassi"},{"id":"g150","p":"Jerome","n":"Douret"},{"id":"g151","p":"Emmanuelle","n":"Kiss"},{"id":"g152","p":"Camille","n":"Fourteau"},{"id":"g153","p":"Bertrand","n":"Domas"},{"id":"g154","p":"Victor","n":"Dulieu"},{"id":"g155","p":"Marion","n":"Mohan"},{"id":"g156","p":"Cyrille","n":"Magnetto"},{"id":"g157","p":"Claire","n":"Durand"},{"id":"g158","p":"Mathieu","n":"Campi"},{"id":"g159","p":"Aurélie","n":"Chauvé"},{"id":"g160","p":"Deborah","n":"Caldeira"},{"id":"g161","p":"Laurent","n":"Vaillant"},{"id":"g162","p":"Hans","n":"Raj Kumar"},{"id":"g163","p":"Capucine","n":"Marteau"},{"id":"g164","p":"Kevin","n":"Mameri"},{"id":"g165","p":"Cédric","n":"Marteau"},{"id":"g166","p":"Malo","n":"Allée"},{"id":"g167","p":"Quentin","n":"Pélabon"},{"id":"g168","p":"Alexandre","n":"Gerard"},{"id":"g169","p":"Grégoire","n":"Mielle"},{"id":"g170","p":"Paul","n":"Dervaux"},{"id":"g171","p":"Aochen","n":"Yang"},{"id":"g172","p":"Julien","n":"Clement"},{"id":"g173","p":"Jérémy","n":"Payan"},{"id":"g174","p":"Cory","n":"Chaplin"},{"id":"g175","p":"Enrique","n":"Sellem"},{"id":"g176","p":"Cedric","n":"Blanchard"},{"id":"g177","p":"Madhu","n":"Desbois"},{"id":"g178","p":"Quentin","n":"Hennebelle"},{"id":"g179","p":"Antoine","n":"Despujols"},{"id":"g180","p":"Julien","n":"Du"},{"id":"g181","p":"François","n":"Uhl"},{"id":"g182","p":"Justine","n":"Stackler"},{"id":"g183","p":"Samuel","n":"Kabbaj"},{"id":"g184","p":"Aurelie","n":"Desvigne"},{"id":"g185","p":"Anais","n":"Ricci"},{"id":"g186","p":"Nicolas","n":"Simon"},{"id":"g187","p":"Camille","n":"Goni"},{"id":"g188","p":"Pascal","n":"Lorne"},{"id":"g189","p":"Aurelien","n":"Francois"},{"id":"g190","p":"Marc-Antoine","n":"Baer"},{"id":"g191","p":"Lamia","n":"Benaouali"},{"id":"g192","p":"Romain","n":"Gerard"},{"id":"g193","p":"Matthieu","n":"Cahu"},{"id":"g194","p":"Mathilde","n":"Rigabert"},{"id":"g195","p":"Maxence","n":"Bruyas"},{"id":"g196","p":"Fatiha","n":"Achour"},{"id":"g197","p":"Alya","n":"Yacoubi"},{"id":"g198","p":"Youssef","n":"Meddeb"},{"id":"g199","p":"Lea","n":"Hijazi"},{"id":"g200","p":"Kévin","n":"Duthoit"},{"id":"g201","p":"Eleonore","n":"Serge"},{"id":"g202","p":"Fabien","n":"Punin"},{"id":"g203","p":"Hugo","n":"Arnoult"},{"id":"g204","p":"Marine","n":"Wetzel"},{"id":"g205","p":"Arom","n":"Phanphengdy"},{"id":"g206","p":"Mikael","n":"Coste"},{"id":"g207","p":"Anthony","n":"Chollet"},{"id":"g208","p":"Anto","n":"Dominic"},{"id":"g209","p":"Daniela","n":"Ciolac"},{"id":"g210","p":"Astrid","n":"de Pelleport"},{"id":"g211","p":"Simon","n":"Gheeraert"},{"id":"g212","p":"Sebastien","n":"Faure"},{"id":"g213","p":"Nicola","n":"Carli"},{"id":"g214","p":"Valentin","n":"Petitjean"},{"id":"g215","p":"Rob","n":"Define"},{"id":"g216","p":"Olga","n":"Besson"},{"id":"g217","p":"Laura","n":"Ville"},{"id":"g218","p":"Nathan","n":"Chauliac"},{"id":"g219","p":"Loïc","n":"Monthorin"},{"id":"g220","p":"Gaetan","n":"Ickx"},{"id":"g221","p":"Rémy","n":"Balangué"},{"id":"g222","p":"Laure","n":"Bonfils"},{"id":"g223","p":"Benjamin","n":"Lassus"},{"id":"g224","p":"Ludovic","n":"Jeanson"},{"id":"g225","p":"Marie","n":"Feld"},{"id":"g226","p":"Ombeline","n":"Choupin"},{"id":"g227","p":"Frédéric","n":"Dermer"},{"id":"g228","p":"Antoine","n":"Laffond"},{"id":"g229","p":"Telly","n":"Antonios"},{"id":"g230","p":"Delphine","n":"Zamparini"},{"id":"g231","p":"Roman","n":"Grebnev"},{"id":"g232","p":"Diane-Laure","n":"Delehedde"},{"id":"g233","p":"Raphael","n":"Hdayach"},{"id":"g234","p":"Anne-Christine","n":"Hubault"},{"id":"g235","p":"Ambroise","n":"Drogou"},{"id":"g236","p":"Michel","n":"Dejoux"},{"id":"g237","p":"Vincent","n":"Hurbourque"},{"id":"g238","p":"Benoit","n":"Sibileau"},{"id":"g239","p":"Alexandre","n":"Hollocou"},{"id":"g240","p":"Audrey","n":"Barbier Litvak"},{"id":"g241","p":"Antoine","n":"Rigaudias"},{"id":"g242","p":"Aina","n":"Demirova"},{"id":"g243","p":"Lorraine","n":"Michot"},{"id":"g244","p":"Olivier","n":"Fontenelle"},{"id":"g245","p":"Nicolas","n":"Valencot"},{"id":"g246","p":"Aymeric","n":"Augustin"},{"id":"g247","p":"Clément","n":"Paillasse"},{"id":"g248","p":"Ying","n":"Zhang"},{"id":"g249","p":"Guillaume","n":"Houlette"},{"id":"g250","p":"Thomas","n":"Nathan"},{"id":"g251","p":"Nils","n":"Escurat"},{"id":"g252","p":"Romain","n":"Séchan"},{"id":"g253","p":"Michael","n":"Ben Mergui"},{"id":"g254","p":"Gérald","n":"Grosrenaud"},{"id":"g255","p":"Benjamin","n":"Biancamaria"},{"id":"g256","p":"Sofiane","n":"Belkhodja"},{"id":"g257","p":"Raphaël","n":"Saint-Aubert"},{"id":"g258","p":"Benjamin","n":"Retourné"},{"id":"g259","p":"Paul-Antoine","n":"Campos"},{"id":"g260","p":"Jean-Baptiste","n":"Kaloya"},{"id":"g261","p":"Ying","n":"Zhang"},{"id":"g262","p":"Desi","n":"Damblemont"},{"id":"g263","p":"Delphine","n":"Gras"},{"id":"g264","p":"Timothée","n":"Keck"},{"id":"g265","p":"Orianne","n":"Iwanow"},{"id":"g266","p":"Flo","n":"Arnal"},{"id":"g267","p":"Enzo","n":"Dozias"},{"id":"g268","p":"Meriem","n":"Maaroufi"},{"id":"g269","p":"Claire","n":"Idelot"},{"id":"g270","p":"Florent","n":"Masson"},{"id":"g271","p":"Mario","n":"Vives"},{"id":"g272","p":"Glen","n":"Hellio"},{"id":"g273","p":"Antoine","n":"Visonneau"},{"id":"g274","p":"Kang","n":"Zhang"},{"id":"g275","p":"Romain","n":"Tchertchian"},{"id":"g276","p":"Arthur","n":"Dion"},{"id":"g277","p":"Paul","n":"Carde"},{"id":"g278","p":"Benoit","n":"Lateltin"},{"id":"g279","p":"Gunesh","n":"Dwarika"},{"id":"g280","p":"Brunève","n":"Ishida"},{"id":"g281","p":"Alicia","n":"Carb"},{"id":"g282","p":"Emilie","n":"Mazin"},{"id":"g283","p":"Antonin","n":"Lorain"},{"id":"g284","p":"Sidney","n":"Golstein"},{"id":"g285","p":"Iony","n":"Pali"},{"id":"g286","p":"Christopher","n":"Coleon"},{"id":"g287","p":"Maxime","n":"Nguyen-Them"},{"id":"g288","p":"Pierre-Eric","n":"Boulland"},{"id":"g289","p":"Marie-Lou","n":"Girard"},{"id":"g290","p":"Frédéric","n":"Blanc"},{"id":"g291","p":"Basile","n":"Coyo"},{"id":"g292","p":"Laurent","n":"Pinjon"},{"id":"g293","p":"Pauline","n":"Skinazi"},{"id":"g294","p":"Sarah","n":"Taoudi"},{"id":"g295","p":"Gabriel","n":"Szanto"},{"id":"g296","p":"Abdel","n":"Iazza"},{"id":"g297","p":"Myriam","n":"Mokrani"},{"id":"g298","p":"Lucas","n":"Mageux"},{"id":"g299","p":"Allan","n":"Bruyere"},{"id":"g300","p":"Gilles","n":"Jabot"},{"id":"g301","p":"Marie","n":"de Ubeda"},{"id":"g302","p":"Adriana","n":"Rodrigues"},{"id":"g303","p":"Emmanuelle","n":"Perrier"},{"id":"g304","p":"Victor","n":"Nove"},{"id":"g305","p":"Yanis","n":"Hadjadji"},{"id":"g306","p":"Adrien","n":"Charaix"},{"id":"g307","p":"Antoine","n":"Gantheret"},{"id":"g308","p":"Donia","n":"Baghdadi"},{"id":"g309","p":"Maria","n":"Nehme"},{"id":"g310","p":"Ayman","n":"Rezouk"},{"id":"g311","p":"Alexis","n":"Blandin"},{"id":"g312","p":"Quentin","n":"Farizon"},{"id":"g313","p":"Julien","n":"Perron"},{"id":"g314","p":"Julien","n":"Bes"},{"id":"g315","p":"Jimmy","n":"Wilde"},{"id":"g316","p":"Romain","n":"Mathieu"},{"id":"g317","p":"Bastien","n":"Bigot"},{"id":"g318","p":"Vincent","n":"Ferrand"},{"id":"g319","p":"Hugo","n":"How-Choong"},{"id":"g320","p":"Yann","n":"Le Chatelier"},{"id":"g321","p":"Hervé","n":"Lam"},{"id":"g322","p":"Olivier","n":"Bachard"},{"id":"g323","p":"Thomas","n":"Schersach"},{"id":"g324","p":"Ludi","n":"Akue"},{"id":"g325","p":"Houda","n":"Jemmali"},{"id":"g326","p":"Yolaine","n":"Mercier"},{"id":"g327","p":"Aleksandra","n":"Ristic"},{"id":"g328","p":"Sandy","n":"Goldscheider"},{"id":"g329","p":"Arnaud","n":"Marcel"},{"id":"g330","p":"Aroua","n":"Biri"},{"id":"g331","p":"Thomas","n":"Thieffry"},{"id":"g332","p":"Jacques","n":"Mesnet"},{"id":"g333","p":"Vincent","n":"Schachter"},{"id":"g334","p":"Louis","n":"Duhamel"},{"id":"g335","p":"Etienne","n":"Caldichoury"},{"id":"g336","p":"Matthieu","n":"Guffroy"},{"id":"g337","p":"Olivier","n":"Cauvin"},{"id":"g338","p":"Alban","n":"Bastard Rosset"},{"id":"g339","p":"Valentin","n":"Poddany"},{"id":"g340","p":"François","n":"Fourmentin"},{"id":"g341","p":"Yazid","n":"Hadni"},{"id":"g342","p":"Ibrahim","n":"Mohamed Ali Ag"},{"id":"g343","p":"Emma","n":"Goldblum"},{"id":"g344","p":"Matthieu","n":"Reboul"},{"id":"g345","p":"Marianne","n":"Ducournau"},{"id":"g346","p":"Marwen","n":"Ben Dhahbia"},{"id":"g347","p":"Carlo","n":"d'Halluin"},{"id":"g348","p":"Kaouther","n":"Ben Ouirane"},{"id":"g349","p":"Alexandre","n":"Homo"},{"id":"g350","p":"Gautier","n":"Delache"},{"id":"g351","p":"Yann-Alexis","n":"Thomasset"},{"id":"g352","p":"Xiaoxiang","n":"Liu"},{"id":"g353","p":"Bertrand","n":"Blais"},{"id":"g354","p":"Nacer-eddine","n":"Benhammouda"},{"id":"g355","p":"Mehdi","n":"Pelet"},{"id":"g356","p":"Jérémie","n":"Laboulbene"},{"id":"g357","p":"Guillaume","n":"Fazekas"},{"id":"g358","p":"Maxime","n":"Paulus"},{"id":"g359","p":"William","n":"Tchen"},{"id":"g360","p":"Achille","n":"Gaubert"},{"id":"g361","p":"Arnaud","n":"Glaizal"},{"id":"g362","p":"Caroline","n":"Tailleferd"},{"id":"g363","p":"Mathieu","n":"Niedzwiedz"},{"id":"g364","p":"Elodie","n":"Doll"},{"id":"g368","p":"Laura","n":"Garde"},{"id":"g369","p":"Jean","n":"Hastings"},{"id":"g370","p":"Julie","n":"Colin"},{"id":"g371","p":"Clémentine","n":"Makangila"},{"id":"g372","p":"Fabien","n":"Blanc"},{"id":"g373","p":"Hadrien","n":"De March"},{"id":"g374","p":"Lucas","n":"Boitier"},{"id":"g375","p":"Sebastien","n":"Treguer"},{"id":"g376","p":"Pierre Tarek","n":"Ullrich"}];
 const LS_KEY = 'tpc-summit-edge-ai-checkins-v1';
 const PAGE = 60;
 
@@ -293,65 +275,9 @@ let mode = 'local';
 const pendingPlus = {};
 
 const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+GUESTS.forEach(g => { g.h = norm(g.p+' '+g.n); });
 const byName = (a,b) => norm(a.n).localeCompare(norm(b.n)) || norm(a.p).localeCompare(norm(b.p));
-function setGuests(list, persist){
-  const seen = {};
-  GUESTS = list.map(g => {
-    let id = g.id || ('g' + hash(norm(g.p+'|'+g.n+'|'+g.e)));
-    while (seen[id]) id += 'x';
-    seen[id] = 1;
-    return {...g, id, h: norm(g.p+' '+g.n+' '+g.c)};
-  }).sort(byName);
-  if (persist) { try { localStorage.setItem(LS_GUESTS, JSON.stringify(GUESTS.map(({h,...r}) => r))); } catch(e){} }
-  document.body.classList.toggle('noguests', !GUESTS.length);
-}
-function hash(s){ let h = 5381; for (let i=0;i<s.length;i++) h = ((h<<5)+h + s.charCodeAt(i)) >>> 0; return h.toString(36); }
-
-// CSV parsing (quotes, commas or semicolons, CRLF, BOM)
-function parseCSV(text){
-  text = text.replace(/^\ufeff/, '');
-  const first = text.split(/\r?\n/)[0] || '';
-  const sep = (first.split(';').length > first.split(',').length) ? ';' : ',';
-  const rows = []; let row = [], cell = '', q = false;
-  for (let i=0;i<text.length;i++){
-    const ch = text[i];
-    if (q) {
-      if (ch === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; }
-      else cell += ch;
-    } else if (ch === '"') q = true;
-    else if (ch === sep) { row.push(cell); cell = ''; }
-    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i+1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
-    else cell += ch;
-  }
-  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
-  return rows;
-}
-function guestsFromCSV(text){
-  const rows = parseCSV(text);
-  if (rows.length < 2) throw new Error('Le fichier est vide.');
-  const head = rows[0].map(h => norm(h).trim());
-  const col = (...names) => { for (const n of names) { const i = head.indexOf(norm(n)); if (i > -1) return i; } return -1; };
-  const iP = col('Prénom','Prenom','First name','Firstname'), iN = col('Nom','Last name','Lastname');
-  if (iP < 0 || iN < 0) throw new Error('Colonnes « Prénom » et « Nom » introuvables.');
-  const iC = col('Entreprise','Company','Société'), iR = col('Poste','Job title','Titre','Fonction');
-  const iE = col('Email pro'), iE2 = col("Email d'inscription",'Email','E-mail');
-  const v = (r,i) => i > -1 ? (r[i]||'').trim() : '';
-  return rows.slice(1).map(r => ({p:v(r,iP), n:v(r,iN), c:v(r,iC), r:v(r,iR), e:v(r,iE) || v(r,iE2)}))
-             .filter(g => g.p && g.n);
-}
-function importFile(file){
-  if (!file) return;
-  const fr = new FileReader();
-  fr.onload = () => {
-    try {
-      const list = guestsFromCSV(String(fr.result));
-      if (!list.length) throw new Error('Aucun participant trouvé dans le fichier.');
-      setGuests(list, true); limit = PAGE; render();
-      toast(`${list.length} participants importés`);
-    } catch(e){ toast(e.message || 'Fichier illisible.', true); }
-  };
-  fr.readAsText(file, 'utf-8');
-}
+GUESTS.sort(byName);
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -371,46 +297,65 @@ const localStore = {
 
 // ---------- shared db ----------
 async function initDb(){
-  if (!window.claude || !window.claude.use) return false;
-  let db = null;
-  try { db = await window.claude.use('db'); } catch(e){ db = null; }
-  if (!db) return false;
-  const ci = db.collection('checkins'), wi = db.collection('walkins');
-  let firstC = false, firstW = false;
-  ci.onSnapshot(snap => {
-    const m = {}; snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
+  const cfg = window.APP_CONFIG || {};
+  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) return false;
+  const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:false}});
+  const toMap = rows => { const m = {}; (rows||[]).forEach(r => { const {id, ...v} = r; m[id] = v; }); return m; };
+
+  async function refresh(){
+    const [c, w] = await Promise.all([
+      sb.from('checkins').select('id,at,plus'),
+      sb.from('walkins').select('id,p,n,c,at,plus')
+    ]);
+    if (c.error || w.error) { setSync('err'); return false; }
+    const m = toMap(c.data);
     for (const id in pendingPlus) if (m[id]) m[id] = {...m[id], plus: pendingPlus[id]};
-    checkins = m; firstC = true; render();
-  }, err => setSync('err'));
-  wi.onSnapshot(snap => {
-    const m = {}; snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
-    walkins = m; firstW = true; render();
-  }, err => setSync('err'));
+    checkins = m; walkins = toMap(w.data);
+    setSync('live'); render(); return true;
+  }
+  if (!(await refresh())) return false;
+
+  sb.channel('accueil')
+    .on('postgres_changes', {event:'*', schema:'public', table:'checkins'}, p => {
+      if (p.eventType === 'DELETE') delete checkins[p.old.id];
+      else { const {id, ...v} = p.new; checkins[id] = pendingPlus[id] != null ? {...v, plus: pendingPlus[id]} : v; }
+      render();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'walkins'}, p => {
+      if (p.eventType === 'DELETE') delete walkins[p.old.id];
+      else { const {id, ...v} = p.new; walkins[id] = v; }
+      render();
+    })
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED') { setSync('live'); refresh(); }
+      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSync('err');
+    });
+
+  // filet de sécurité : resynchronise régulièrement et au retour sur l'app
+  setInterval(() => { if (!document.hidden) refresh(); }, 20000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  window.addEventListener('online', refresh);
+
+  const chk = async r => { const { error } = await r; if (error) throw error; };
   store = {
     async setCheckin(id, v){
-      if (v) { checkins[id]=v; render(); await write(() => ci.doc(id).set(v)); }
-      else { delete checkins[id]; render(); await write(() => ci.doc(id).delete()); }
+      if (v) { checkins[id]=v; render(); await write(() => chk(sb.from('checkins').upsert({id, at:v.at, plus:v.plus||0}))); }
+      else { delete checkins[id]; render(); await write(() => chk(sb.from('checkins').delete().eq('id', id))); }
     },
     async setWalkin(id, v){
-      if (v) { walkins[id]=v; render(); await write(() => wi.doc(id).set(v)); }
-      else { delete walkins[id]; render(); await write(() => wi.doc(id).delete()); }
+      if (v) { walkins[id]=v; render(); await write(() => chk(sb.from('walkins').upsert({id, p:v.p, n:v.n, c:v.c||'', at:v.at, plus:v.plus||0}))); }
+      else { delete walkins[id]; render(); await write(() => chk(sb.from('walkins').delete().eq('id', id))); }
     }
   };
   mode = 'db';
-  setSync('live');
   return true;
 }
 async function write(fn){
   try { await fn(); }
   catch(e){
-    if (e && e.code === 'unavailable') {
-      await new Promise(r => setTimeout(r, 400 + Math.random()*600));
-      try { await fn(); return; } catch(e2){ e = e2; }
-    }
-    const msg = e && e.code === 'invalid_argument'
-      ? "Enregistrement refusé : demandez à l'organisatrice un accès Contributeur."
-      : "Enregistrement impossible, vérifiez la connexion puis réessayez.";
-    toast(msg, true);
+    await new Promise(r => setTimeout(r, 500 + Math.random()*700));
+    try { await fn(); return; }
+    catch(e2){ toast("Enregistrement impossible, vérifiez la connexion puis réessayez.", true); }
   }
 }
 function setSync(s){
@@ -418,7 +363,7 @@ function setSync(s){
   el.classList.toggle('live', s==='live');
   el.querySelector('span').textContent =
     s==='live' ? 'Synchronisé' :
-    s==='err' ? 'Synchro coupée, rechargez' :
+    s==='err' ? 'Synchro coupée' :
     'Sur cet appareil';
 }
 
@@ -494,7 +439,7 @@ function render(){
   const parts = [`<b>${inGuests}</b> inscrit${inGuests>1?'s':''} arrivé${inGuests>1?'s':''}`];
   if (plus) parts.push(`<b>${plus}</b> accompagnant${plus>1?'s':''}`);
   if (wl.length) parts.push(`<b>${wl.length}</b> hors liste`);
-  $('summary').innerHTML = GUESTS.length ? `${parts.join(', ')}.<br><b>${room}</b> personne${room>1?'s':''} sur place au total.` : 'Aucune liste importée.';
+  $('summary').innerHTML = `${parts.join(', ')}.<br><b>${room}</b> personne${room>1?'s':''} sur place au total.`;
   $('bar').style.width = (GUESTS.length ? (inGuests/GUESTS.length*100) : 0) + '%';
   $('nAll').textContent = people.length;
   $('nTodo').textContent = GUESTS.length - inGuests;
@@ -516,15 +461,15 @@ function render(){
   const shown = rows.slice(0, limit);
   $('list').innerHTML = shown.map(x => {
     const rec = x.walk ? walkins[x.id] : checkins[x.id];
-    const meta = [x.c, x.r].filter(Boolean).join(', ') || (x.walk ? '' : 'Entreprise non renseignée');
+    const meta = [x.c, x.r].filter(Boolean).join(', ');
     const tag = x.walk ? '<span class="tag">Hors liste</span>' : '';
     const name = `<div class="name">${hl(x.p+' '+x.n, tokens)}${tag}</div>`;
     if (!rec) {
-      return `<li class="row"><div class="who">${name}<div class="meta">${hl(meta,tokens)}</div></div>
+      return `<li class="row"><div class="who">${name}${meta?`<div class="meta">${hl(meta,tokens)}</div>`:''}</div>
         <div class="right"><button class="btn btn-primary" data-act="in" data-id="${x.id}">Arrivé</button></div></li>`;
     }
     const plus = rec.plus||0;
-    return `<li class="row in"><div class="who">${name}<div class="meta">${hl(meta,tokens)}</div>
+    return `<li class="row in"><div class="who">${name}${meta?`<div class="meta">${hl(meta,tokens)}</div>`:''}
         <div class="status">Arrivé·e à ${hhmm(rec.at)}${plus?`, +${plus} accompagnant${plus>1?'s':''}`:''}</div></div>
       <div class="right">
         <div class="stepper" aria-label="Accompagnants">
@@ -541,7 +486,7 @@ function render(){
 
   let empty = '';
   if (!rows.length) {
-    if (tokens.length) empty = `<div class="empty">Personne ne correspond à « ${esc(query)} ».<br>Essayez avec le prénom seul ou l'entreprise.<br>
+    if (tokens.length) empty = `<div class="empty">Personne ne correspond à « ${esc(query)} ».<br>Essayez avec le prénom ou le nom seul.<br>
       <button class="btn btn-primary" data-act="walk">Ajouter ${esc(query)} hors liste</button></div>`;
     else if (filter==='in') empty = `<div class="empty">Aucune arrivée pour l'instant.</div>`;
     else empty = `<div class="empty">Tout le monde est arrivé.</div>`;
@@ -610,23 +555,16 @@ $('walkForm').addEventListener('submit', e => {
 // export
 $('exportBtn').addEventListener('click', async () => {
   const cell = v => { v = String(v??''); return /[;"\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
-  const lines = [['Statut','Source','Prénom','Nom','Entreprise','Poste','Email','Heure d\'arrivée','Accompagnants'].join(';')];
+  const lines = [['Statut','Source','Prénom','Nom','Entreprise','Heure d\'arrivée','Accompagnants'].join(';')];
   GUESTS.slice().sort(byName).forEach(g => {
     const r = checkins[g.id];
-    lines.push([r?'Arrivé':'Absent','Liste',g.p,g.n,g.c,g.r,g.e,r?hhmm(r.at):'',r?(r.plus||0):''].map(cell).join(';'));
+    lines.push([r?'Arrivé':'Absent','Liste',g.p,g.n,'',r?hhmm(r.at):'',r?(r.plus||0):''].map(cell).join(';'));
   });
   Object.values(walkins).forEach(w => {
-    lines.push(['Arrivé','Hors liste',w.p,w.n,w.c,'','',hhmm(w.at),w.plus||0].map(cell).join(';'));
+    lines.push(['Arrivé','Hors liste',w.p,w.n,w.c,hhmm(w.at),w.plus||0].map(cell).join(';'));
   });
   const csv = '\ufeff' + lines.join('\r\n');
   const filename = 'presences-tpc-summit-edge-of-ai.csv';
-  let dl = null;
-  try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch(e){}
-  if (dl) {
-    try { await dl.save({filename, data: csv}); }
-    catch(e){ if (e && e.code !== 'declined') toast("Export impossible depuis cet appareil.", true); }
-    return;
-  }
   try {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
@@ -635,15 +573,12 @@ $('exportBtn').addEventListener('click', async () => {
 });
 
 // ---------- boot ----------
-try { const saved = JSON.parse(localStorage.getItem(LS_GUESTS) || '[]'); setGuests(saved, false); } catch(e){ setGuests([], false); }
-$('csvFile').addEventListener('change', e => { importFile(e.target.files[0]); e.target.value=''; });
-$('csvFile2').addEventListener('change', e => { importFile(e.target.files[0]); e.target.value=''; });
 loadLocal();
 store = localStore;
 setSync('local');
 render();
 initDb().then(ok => {
-  if (!ok) { setSync('local'); $('footNote').textContent = "Les arrivées sont enregistrées dans ce navigateur, sur cet appareil."; }
+  if (!ok) { setSync('local'); $('footNote').textContent = "Synchronisation non configurée : les arrivées restent sur cet appareil (voir config.js)."; }
   else { $('footNote').textContent = ''; }
 });
 </script>
